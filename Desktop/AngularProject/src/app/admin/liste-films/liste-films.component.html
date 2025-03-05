@@ -1,0 +1,15 @@
+<div class="container">
+  <div class="card shadow mb-4">
+  <div class="card-body">
+  <table class="table table-striped">
+  <tbody>
+  <tr> <th>Id</th><th>Nom</th> <th>Description</th> </tr>
+  <tr *ngFor="let film of tabFilms">
+  <td>{{film.id}}</td>
+  <td>{{film.nom}}</td>
+  <td>{{film.description}}</td>
+</tbody>
+</table>
+</div>
+</div>
+</div>
