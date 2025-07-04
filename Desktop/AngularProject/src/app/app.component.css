@@ -1,0 +1,23 @@
+h2{
+  color: red;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+nav a
+{
+text-decoration: none;
+ display:inline-block;
+margin : 0px;
+padding:5px;
+border-right: pink 1px solid;
+color:#FFFFFF;}
+nav
+{
+background-color: black;
+}
+a:active
+{
+color:#FFFFFF;
+}
+.active{
+  background-color: pink;
+}
