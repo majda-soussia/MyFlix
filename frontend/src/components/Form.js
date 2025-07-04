@@ -51,7 +51,7 @@ export const Form = ({onLogin}) => {
         </div>
 
         <div lassName="mt-3">
-          <a href="#" style={{ color: "rgb(255, 255, 255)" , fontWeight: 'bold'}}>REGISTER</a>
+          <a href="register" style={{ color: "rgb(255, 255, 255)" , fontWeight: 'bold'}}>REGISTER</a>
         </div>
       </form>
     </div>
