@@ -9,6 +9,7 @@ export const Sidebar = () => {
     { label: "Home", path: "/", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
+    { label: "Profile", path: "/profil", icon: "/images/profile.png" },
   ];
   return (
     <div
@@ -16,7 +17,7 @@ export const Sidebar = () => {
         width: "200px",
         height: "100vh",
         background: "black",
-        padding: "20px 0",
+        padding: "60px 0",
         color: "white",
         display: "flex",
         flexDirection: "column",
