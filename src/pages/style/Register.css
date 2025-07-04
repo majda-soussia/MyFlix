@@ -1,0 +1,10 @@
+.register  {
+    background-image: url('../../../public/images/2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+  }
+  
