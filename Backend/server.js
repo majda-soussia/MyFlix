@@ -1,29 +1,35 @@
+require("dotenv").config(); 
 const express = require("express");
-const database = require("./src/Database/Database.js");
+const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
-const app = express();
+const database = require("./Database/Database.js");
+//express app
+const app = express()
+const worKoutRouter=require('./Routes/Router.js')
+app.use('/api/workouts',worKoutRouter)
+
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(express.json());
-database.mongoose
-  .connect(process.env.DATABASE_URL, {})
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-const cors = require('cors');
-app.use(cors({
-  origin: 'http://localhost:4200'
-}));
+// Connect to MongoDB 
+database.mongoose.connect(process.env.DATABASE_URL)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
-require("./src/Routes/Route.js")(app);
 
+
+// Error Handling
+app.use((req, res) => res.status(404).json({ message: "Route not found" }));
+
+// Start server
 app.listen(process.env.PORT, () => {
-  console.log("Server is running on port ", process.env.PORT);
+  console.log(`🚀 Server is running on port ${process.env.PORT}`);
 });
