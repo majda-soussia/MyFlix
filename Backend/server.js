@@ -3,17 +3,15 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const database = require("./Database/Database.js");
-//express app
-const app = express()
-const worKoutRouter=require('./Routes/Router.js')
-app.use('/api/workouts',worKoutRouter)
-
-
+const app = express();
+app.use(express.json());
+app.use("/api/users", require("./Routes/UserRouter"));
+app.use("/api/auth", require("./Routes/AuthRouter"));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 // Static files

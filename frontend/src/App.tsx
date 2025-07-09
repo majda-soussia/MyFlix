@@ -1,12 +1,10 @@
 import React from "react";
 import "./App.css";
 import {  Routes, Route  } from "react-router-dom";
-import Login from "./pages/Login.js";
+import Login from "./pages/Login.tsx";
 import Home from "./pages/Home.tsx";
 import Welcome from './pages/welcome.tsx';
-import Register from './pages/Register.js';
-
-
+import Register from './pages/Register.tsx';
 const App: React.FC =()=> {
   return (
     <div className="App">

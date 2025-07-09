@@ -1,5 +1,5 @@
 import React from "react";
-import Form from '../components/Form';
+import Form from '../components/Form.tsx';
 import { useNavigate } from 'react-router-dom';
 import './style/Login.css'
 type LoginCredentials = {

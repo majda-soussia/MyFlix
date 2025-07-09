@@ -1,6 +1,9 @@
 const { Schema } = require("mongoose");
 
 module.exports = (mongoose) => {
+  if (mongoose.models.User) {
+    return mongoose.models.User;
+  }
   const UserSchema = new Schema(
     {
       email: {
