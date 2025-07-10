@@ -10,7 +10,7 @@ module.exports = (mongoose) => {
       genres: {
         type: [String],
         enum: ["Action", "Aventure", "Animation", "Comédie", "Crime", "Documentaire", "Drame", "Famille", "Fantastique", "Histoire", "Horreur", "Musique", "Mystère", "Romance", "Science-Fiction", "Téléfilm", "Thriller", "Guerre", "Western"],
-        required: true
+        required: true,
       },
       releaseDate: { type: Date, required: true },
     },

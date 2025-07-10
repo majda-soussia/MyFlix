@@ -49,7 +49,7 @@ exports.getAllFilms = async (req, res) => {
         image: `https://image.tmdb.org/t/p/w500${film.poster_path}`,
         releaseDate: film.release_date,
         rate: film.vote_average,
-        type: genreNames.join(', ')
+        type: genreNames.join(', '),
       };
     });
 
