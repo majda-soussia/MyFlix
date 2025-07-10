@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User")(require("mongoose"));
 const JWT_SECRET = process.env.JWT_SECRET || "secret_key_example";
+
 exports.loginUser=async(req,res)=>{
     try{
         const {email,password}=req.body;

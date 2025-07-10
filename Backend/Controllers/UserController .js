@@ -77,3 +77,79 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.SenEmail = async (req, res) => {
+  const { email } = req.body;
+  if(!email){
+    res.status(400).json("Email is required");
+      return;
+  }
+  const user = await User.findOne({ email });
+  if (user){
+    const url = `http://localhost:3000/motdepasseoublie/${user._id}`;
+    const transporter = nodemailer.createTransport({
+    service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    });
+     const mailOptions = {
+      from: "sirineraies20@gmail.com",
+      to: email,
+      subject: "Reset your password",
+      html: `Dear user,
+        <br/><br/>
+        We would like to inform you that a password reset event has been triggered for your account. To complete the reset process and choose a new password, please click on the following link: ${url}.
+        <br/><br/>
+        This link will redirect you to a page where you can enter your new password. We recommend choosing a strong password and keeping it confidential to ensure the security of your account.
+        <br/><br/>
+        If you did not initiate this password reset request, please contact our support team immediately so we can take the necessary steps to secure your account.
+        <br/><br/>
+        If you have any questions or technical issues, feel free to contact us. We are here to help you at any time.
+        <br/><br/>
+        Thank you for your understanding and cooperation.
+        <br/>
+        Best regards,`,
+     };
+
+     transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(400).json("An error occurred while sending the email");
+      }else {
+        res.status(200).json({info})
+        res.status(200).json(" An email has been sent successfully");
+      }})
+    }
+    else {
+      res.status(400).json(" this email does not exist");
+    } 
+}
+
+exports.changePassword = async (req, res) => {
+   const {newpassword,newpasswordComfirm} = req.body
+    
+    if (!newpassword || !newpasswordComfirm) {
+      res.status(400).json("All fields are required");
+      return;
+   }
+   if (newpassword !== newpasswordComfirm) {
+      res.status(400).json("The two passwords do not match");
+      return;
+   }
+   try {
+ //hashing password
+   const salt = await bcrypt.genSalt(10)
+   const hashednewPassword = await bcrypt.hash(newpassword, salt)
+   // add to the database
+   const user = await User.findById(req.params.id);
+   user.password=hashednewPassword;
+   await user.save()
+   res.status(200).json(user)
+   return;
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+    return;
+  }
+}

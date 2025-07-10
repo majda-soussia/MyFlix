@@ -6,7 +6,6 @@ const database = require("./Database/Database.js");
 const app = express();
 app.use(express.json());
 app.use("/api/users", require("./Routes/UserRouter"));
-app.use("/api/auth", require("./Routes/AuthRouter"));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true

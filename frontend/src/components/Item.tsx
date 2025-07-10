@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
+import "../components/style/Item.css"
 type ItemProps = {
   title: string;
   imageUrl: string;
@@ -8,38 +8,38 @@ type ItemProps = {
   onClick?: () => void;
 };
 
-const Item: React.FC<ItemProps> = ({ title, imageUrl, rating, type, onClick }) => {
+const Item: React.FC<ItemProps> = ({
+  title,
+  imageUrl,
+  rating,
+  type,
+  onClick,
+}) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     setIsFavorite((prev) => !prev);
   };
 
   return (
-    <div
-      onClick={onClick}
-      className="w-60 p-4 bg-white shadow rounded-xl cursor-pointer hover:shadow-lg transition relative"
-    >
-      <img
-        src={imageUrl}
-        alt={title}
-        className="w-full h-36 object-cover rounded-md mb-3"
-      />
+    <div className="item-card" onClick={onClick}>
+    <img className="item-image" src={imageUrl} alt={title} />
 
-      {/* Heart icon */}
+    <button className="heart-icon" onClick={toggleFavorite}>
       <img
-        src={isFavorite ? '/heart-full.png' : '/heart-empty.png'}
+        src={isFavorite ? "/images/fullheart.png" : "/images/emptyheart.png"}
         alt="favorite"
-        onClick={toggleFavorite}
-        className="w-6 h-6 absolute top-3 right-3 cursor-pointer"
       />
+    </button>
 
-      <h2 className="text-lg font-semibold truncate">{title}</h2>
-      {type && <p className="text-sm text-blue-600">{type}</p>}
+    <div className="item-info">
+      <h3>{title}</h3>
+      <p>{type}</p>
       {rating !== undefined && (
-        <p className="text-sm text-yellow-500">⭐ {rating.toFixed(1)}</p>
-      )}
+          <p className="text-sm text-yellow-400">⭐ {rating.toFixed(1)}</p>
+        )}
+    </div>
     </div>
   );
 };

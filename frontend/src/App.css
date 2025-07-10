@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+.slick-slide {
+  display: flex !important;
+  /*justify-content: center;*/
+  align-items: center;
+}
+
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide > div {
+  height: 100%; 
+}
+
