@@ -1,34 +1,49 @@
 import React, { useState } from "react";
-import './style/Form.css'
-type LoginCredentials = {
-  email: string;
-  password: string;
-};
-type FormProps = {
-  onLogin: (credentials: LoginCredentials) => void;
-};
+import { useNavigate } from "react-router-dom";
+import './style/Form.css';
 
-export const Form: React.FC<FormProps> = ({onLogin}) => {
+const Form: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { 
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (email === "" || password === "") {
       alert("Please fill in all the fields!");
-      return; 
+      return;
     }
-    if (onLogin) {
-      onLogin({ email, password });
+
+    try {
+      const res = await fetch("http://localhost:4000/MyFlix/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Login successful!");
+        // Optional: Save token to localStorage or context
+        // localStorage.setItem('token', data.token);
+        navigate("/home"); // or whatever page you want after login
+      } else {
+        alert("❌ " + (data.error || data.message || "Login failed"));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred. Please try again later.");
     }
-    
   };
 
   return (
-    <div >
-     
-      <form onSubmit={handleSubmit} >
-
-        <div >
+    <div>
+      <form onSubmit={handleSubmit}>
+        <div>
           <label htmlFor="email">Email ID</label>
           <input
             type="email"
@@ -50,18 +65,28 @@ export const Form: React.FC<FormProps> = ({onLogin}) => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             placeholder="Enter your password"
           />
-        </div><hr></hr>
+        </div>
 
-        <div >
-          <button type="submit" >LOGIN</button>
-          <a href="#" style={{ color:"rgb(255, 255, 255)", fontWeight: 'bold'}}>Forgot Password?</a>
+        <hr />
+
+        <div>
+          <button type="submit">LOGIN</button>
+          <a href="/FormMail" style={{ color: "white", fontWeight: "bold", marginLeft: "10px" }}>
+            Forgot Password?
+          </a>
         </div>
 
         <div className="mt-3">
-          <a href="register" style={{ color: "rgb(255, 255, 255)" , fontWeight: 'bold'}}>REGISTER</a>
+          <p>
+            Don't have an account?{" "}
+            <a href="/register" style={{ color: "white", fontWeight: "bold" }}>
+              REGISTER
+            </a>
+          </p>
         </div>
       </form>
     </div>
   );
-}
+};
+
 export default Form;

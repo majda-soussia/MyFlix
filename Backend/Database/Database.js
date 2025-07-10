@@ -6,4 +6,4 @@ mongoose.set("strictQuery", false);
 db.mongoose = mongoose;
 db.url = process.env.DATABASE_URL;
 db.User = require("../Models/User")(mongoose);
-module.exports = db;
+module.exports =db;

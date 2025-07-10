@@ -1,5 +1,5 @@
 import React from "react";
-import FormRegister from "../components/FormRegister";
+import FormRegister from "../components/FormRegister.tsx";
 import { useNavigate } from "react-router-dom";
 import "./style/Register.css";
 
@@ -35,7 +35,7 @@ const Register: React.FC = () => {
   };
   return (
     <div className="register">
-      <FormRegister onLogin={handleLogin} />
+      <FormRegister  />
     </div>
   );
 };
