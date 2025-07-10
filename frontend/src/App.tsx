@@ -5,6 +5,9 @@ import Login from "./pages/Login.tsx";
 import Home from "./pages/Home.tsx";
 import Welcome from './pages/welcome.tsx';
 import Register from './pages/Register.tsx';
+import Sendmail from "./pages/Sendmail.tsx";
+import PasswordReset from "./pages/PasswordReset.tsx";
+
 const App: React.FC =()=> {
   return (
     <div className="App">
@@ -13,6 +16,9 @@ const App: React.FC =()=> {
         <Route path="/login" element={<Login />} />
         <Route path="/home/*" element={<Home />} /> 
         <Route path="/register" element={<Register />} />
+        <Route path="/FormMail" element={<Sendmail/>} />   
+        <Route path="/confirmpassword/:id" element={<PasswordReset/>} />   
+         
       </Routes>
   </div>
   );

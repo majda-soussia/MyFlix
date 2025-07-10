@@ -1,139 +1,118 @@
 import React, { useState } from "react";
-import './style/Form.css'
-type RegisterData = {
-  email: string;
-  nom: string;
-  prenom: string;
-  password: string;
-  birthday: string;
-  gender: string;
-};
-type FormProps = {
-  onLogin: (data: RegisterData) => void;
-};
-export const Form:React.FC<FormProps>= ({onLogin}) => {
-  const [email, setEmail] = useState<string>("");
-  const [nom, setNom] = useState<string>("");
-  const [prenom, setPrenom] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [birthday, setBirthday] = useState<string>("");
-  const [gender, setGender] = useState<string>("");
-  
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { 
+import { useNavigate } from "react-router-dom";
+import "./style/Form.css";
+
+const Form: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email || !password || !nom || !prenom || !birthday || !gender) {
+
+    if (!email ||  !firstname || !lastname|| !password || !confirmPassword || !birthday || !gender) {
       alert("Please fill in all the fields!");
       return;
     }
-    if (onLogin) {
-      onLogin({ email, password, nom, prenom, birthday, gender });
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
     }
-    
+
+    try {
+
+      const res = await fetch("http://localhost:4000/MyFlix/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email , firstname, lastname, password,confirmPassword,  birthday, gender }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Registered successfully!");
+        navigate("/login");
+      } else {
+alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
+    }
   };
 
   return (
-    <div >
-     
-    <form onSubmit={handleSubmit} >
-        <div >
-          <label htmlFor="Nom">First Name</label>
-          <input
-            type="text"
-            name="nom"
-            id="nom"
-            value={nom}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNom(e.target.value)}
-            placeholder="Enter your first name"
-          />
+    <div>
+      <form onSubmit={handleSubmit}>
+         <div>
+          <label>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+        </div>
+        <div>
+          <label>First Name</label>
+          <input type ="text" value={firstname} onChange={(e) => setFirstname(e.target.value)} placeholder="First name" />
         </div>
 
-        <div >
-          <label htmlFor="Prenom">Last Name</label>
-          <input
-            type="text"
-            name="premon"
-            id="prenom"
-            value={prenom}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrenom(e.target.value)}
-            placeholder="Enter your last name"
-          />
+        <div>
+          <label>Last Name</label>
+          <input type="text" value={lastname} onChange={(e) => setLastname(e.target.value)} placeholder="Last name" />
         </div>
 
-        <div >
-          <label htmlFor="Email">Email</label>
+       
+
+        <div>
+          <label>Password</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+        </div>
+
+        <div>
+          <label>Confirm Password</label>
           <input
-            type="email"
-            name="email"
-            id="email"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm password"
           />
         </div>
 
         <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-          />
-        </div>
-        
-        <div >
-          <label htmlFor="password">Confirm your password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            placeholder="Confirm your password"
-          />
+          <label>Date of Birth</label>
+          <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} />
         </div>
 
         <div>
-            <label htmlFor="birthday">Date of Birth</label>
-            <input
-                type="date"
-                name="birthday"
-                id="birthday"
-                value={birthday}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBirthday(e.target.value)}
-            />
-            </div>
-
-            <div>
-            <label htmlFor="gender">Gender</label>
-            <select
-                name="gender"
-                id="gender"
-                value={gender}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setGender(e.target.value)}
-            >
-                <option value="Female">Select your gender</option>
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-            </select>
-            </div>
-
-        
-        <hr></hr>
-
-        <div >
-          <button type="submit" >LOGIN</button>
+          <label>Gender</label>
+          <select value={gender} onChange={(e) => setGender(e.target.value)}>
+            <option value="">Select</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+          </select>
         </div>
+
+        <hr />
+
+        <button type="submit">Register</button>
 
         <div className="mt-3">
-          <p>You have already an account ? 
-          <a href="login" style={{ color: "rgb(255, 255, 255)" , fontWeight: 'bold'}}> Login</a>
+          <p>
+            Already have an account?{" "}
+            <a href="/login" style={{ color: "white", fontWeight: "bold" }}>
+              Login
+            </a>
           </p>
         </div>
       </form>
     </div>
   );
-}
+};
+
 export default Form;

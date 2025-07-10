@@ -9,14 +9,10 @@ type LoginCredentials = {
 
 const Login: React.FC = () => {
   const navigate= useNavigate();
-  const handleLogin = ({ email, password }: LoginCredentials) => {
-    console.log("login attempt:", email, password);
-    alert(`welcom,${email}!`);
-    navigate('/home');
-  };
+ 
   return (
     <div className="login">
-      <Form onLogin={handleLogin} />
+      <Form />
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import reportWebVitals from './reportWebVitals';
+import App from './App.tsx';
+import reportWebVitals from './reportWebVitals.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter } from 'react-router-dom'; 
-import App from './App.tsx';
+
 const rootElement = document.getElementById('root');
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
@@ -19,4 +20,4 @@ if (rootElement) {
   throw new Error("Root element not found");
 }
 
-reportWebVitals();
+ reportWebVitals();

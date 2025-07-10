@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const User = require("../Models/User")(mongoose);
+const nodemailer = require("nodemailer");
+
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -19,21 +21,31 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.createUser = async (req, res) => {
   try {
-    const { email, firstname, lastname, password, birthday, gender } = req.body;
+    const { email, firstname, lastname, password, confirmPassword, birthday, gender } = req.body;
 
-    if (!email || !firstname || !lastname || !password || !birthday || !gender) {
+    // Check required fields
+    if (!email || !firstname || !lastname || !password || !confirmPassword || !birthday || !gender) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match." });
+    }
+
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: "This email is already used." });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create and save user
     const newUser = new User({
       email,
       firstname,
@@ -45,8 +57,18 @@ exports.createUser = async (req, res) => {
 
     await newUser.save();
 
-    const userToReturn = newUser.toJSON();
-    res.status(201).json(userToReturn);
+    // Optionally send a safe response
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        firstname: newUser.firstname,
+        lastname: newUser.lastname,
+        birthday: newUser.birthday,
+        gender: newUser.gender
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -78,15 +100,15 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.SenEmail = async (req, res) => {
+exports.SendEmail = async (req, res) => {
   const { email } = req.body;
   if(!email){
     res.status(400).json("Email is required");
       return;
   }
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }); //nlawj aal mail fl database
   if (user){
-    const url = `http://localhost:3000/motdepasseoublie/${user._id}`;
+    const url = `http://localhost:3000/confirmpassword/${user._id}`;
     const transporter = nodemailer.createTransport({
     service: "gmail",
       auth: {
@@ -118,7 +140,6 @@ exports.SenEmail = async (req, res) => {
         console.log(error);
         res.status(400).json("An error occurred while sending the email");
       }else {
-        res.status(200).json({info})
         res.status(200).json(" An email has been sent successfully");
       }})
     }
@@ -143,13 +164,17 @@ exports.changePassword = async (req, res) => {
    const salt = await bcrypt.genSalt(10)
    const hashednewPassword = await bcrypt.hash(newpassword, salt)
    // add to the database
-   const user = await User.findById(req.params.id);
-   user.password=hashednewPassword;
-   await user.save()
+  await User.findByIdAndUpdate(
+  req.params.id,
+  { password: hashednewPassword },
+  { runValidators: true } // optional
+);
+res.status(200).json({ message: "Password updated successfully." });
+
    res.status(200).json(user)
    return;
   } catch (error) {
     res.status(400).json({ error: error.message })
-    return;
-  }
+ return;
+}
 }

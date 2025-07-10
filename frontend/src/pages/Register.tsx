@@ -35,7 +35,7 @@ const Register: React.FC = () => {
   };
   return (
     <div className="register">
-      <FormRegister onLogin={handleLogin} />
+      <FormRegister  />
     </div>
   );
 };

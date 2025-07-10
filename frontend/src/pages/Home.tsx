@@ -1,8 +1,12 @@
 import React from "react";
 import Sidebar from "../components/Sidebar.tsx";
 import Header from "../components/Header.tsx";
+<<<<<<< HEAD
 import Trend from "../components/Trend.tsx";
 const Home: React.FC = () => {
+=======
+const Home:React.FC= () => {
+>>>>>>> origin/asma
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <Sidebar />
