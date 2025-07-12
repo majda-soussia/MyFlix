@@ -22,7 +22,7 @@ export const Sidebar: React.FC = ()  => {
       style={{
         width: "200px",
         height: "100vh",
-        background: "black",
+        background: " linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 94%, rgba(74, 13, 13, 1) 100%)",
         padding: "60px 0",
         color: "white",
         display: "flex",

@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import "../components/style/Item.css"
 type ItemProps = {
+  id: number; 
   title: string;
   imageUrl: string;
   rating?: number;
   type?: string;
-  onClick?: () => void;
+  onClick?: (id: number) => void;
 };
 
 const Item: React.FC<ItemProps> = ({
+  id,
   title,
   imageUrl,
   rating,
@@ -21,14 +23,16 @@ const Item: React.FC<ItemProps> = ({
     e.stopPropagation();
     setIsFavorite((prev) => !prev);
   };
-
+  const handleClick = () => {
+    if (onClick) onClick(id);
+  };
   return (
-    <div className="item-card" onClick={onClick}>
+    <div className="item-card" onClick={handleClick}>
     <img className="item-image" src={imageUrl} alt={title} />
 
     <button className="heart-icon" onClick={toggleFavorite}>
       <img
-        src={isFavorite ? "/images/fullheart.png" : "/images/emptyheart.png"}
+        src={isFavorite ? "/images/fullheart1.png" : "/images/emptyheart1.png"}
         alt="favorite"
       />
     </button>

@@ -1,19 +1,18 @@
 import React from "react";
+import styles from "./style/Home.module.css";
 import Sidebar from "../components/Sidebar.tsx";
 import Header from "../components/Header.tsx";
-<<<<<<< HEAD
 import Trend from "../components/Trend.tsx";
-const Home: React.FC = () => {
-=======
+import Recomandation  from "../components/Recomandation.tsx";
 const Home:React.FC= () => {
->>>>>>> origin/asma
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className={styles.container}>
       <Sidebar />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className={styles.content}>
         <Header />
-        <div style={{ height: "100vh" , overflowY: "auto"}}>
+        <div className={styles.scrollable}>
           <Trend />
+          <Recomandation />
         </div>
       </div>
     </div>

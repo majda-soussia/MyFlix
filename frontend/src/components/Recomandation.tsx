@@ -83,7 +83,7 @@ const Trend: React.FC = () => {
           marginBottom: "40px",
         }}
       >
-        Trending at this moment
+        Recommended for You
       </h2>
       <div
         style={{
