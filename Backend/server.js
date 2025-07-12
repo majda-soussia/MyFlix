@@ -2,8 +2,6 @@ const express = require("express");
 const database = require("./Database/Database.js");
 const path = require("path");
 require("dotenv").config();
-const cors = require('cors');
-
 
 const app = express();
 app.use(express.json());
@@ -23,11 +21,12 @@ app.use(cors({
   origin: 'http://localhost:3000'
 }));
 
-const Routes = require("./Routes/UserRouter.js");
-const RoutesAuth = require("./Routes/AuthRouter.js");
-
-app.use("/MyFlix",Routes); // ou le préfixe que tu veux
-app.use("/MyFlix",RoutesAuth); // ou le préfixe que tu veux
+const UserRoutes = require("./Routes/UserRouter.js");
+const FilmRoutes = require('./Routes/FilmRouter.js');
+app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+app.use("/api/users",UserRoutes);
+app.use("/api/auth", require("./Routes/AuthRouter.js"));
+app.use("/api/films", FilmRoutes);
 
 
 app.listen(process.env.PORT, () => {
