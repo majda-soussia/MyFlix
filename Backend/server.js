@@ -7,8 +7,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.use(express.json());
 database.mongoose
   .connect(process.env.DATABASE_URL, {})
   .then(() => {
@@ -24,9 +22,11 @@ app.use(cors({
 
 const UserRoutes = require("./Routes/UserRouter.js");
 const FilmRoutes = require('./Routes/FilmRouter.js');
+
+app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use("/api/users",UserRoutes);
 app.use("/api/auth", require("./Routes/AuthRouter.js"));
-app.use("/api/films",FilmRoutes);
+app.use("/api/films", FilmRoutes);
 
 
 app.listen(process.env.PORT, () => {
