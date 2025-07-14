@@ -42,7 +42,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
         boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
       }}
     >
-      {/* Close button */}
       <button
         onClick={onClose}
         style={{
@@ -61,8 +60,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
       >
         ✕
       </button>
-
-      {/* Favorite Button */}
       <div style={{ position: "absolute", bottom: "20px", right: "20px" }}>
         <button
           onClick={toggleFavorite}
@@ -84,7 +81,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
         </button>
       </div>
 
-      {/* Image */}
       <img
         src={movie.imageUrl}
         alt={movie.title}
@@ -95,8 +91,6 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
           objectFit: "cover",
         }}
       />
-
-      {/* Info */}
       <div style={{ flex: 1 }}>
         <h2 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "10px" }}>{movie.title}</h2>
 
