@@ -7,7 +7,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter } from 'react-router-dom'; 
 
 const rootElement = document.getElementById('root');
-
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
   root.render(

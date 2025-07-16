@@ -15,14 +15,14 @@ export const Sidebar: React.FC = ()  => {
     { label: "Home", path: "/", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
-    { label: "Profile", path: "/profil", icon: "/images/profile.png" },
+    { label: "Account Settings", path: "/account/:id", icon: "/images/profile.png" },
   ];
   return (
     <div
       style={{
         width: "200px",
         height: "100vh",
-        background: "black",
+        background: " linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 94%, rgba(74, 13, 13, 1) 100%)",
         padding: "60px 0",
         color: "white",
         display: "flex",

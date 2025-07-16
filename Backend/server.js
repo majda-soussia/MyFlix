@@ -15,7 +15,8 @@ database.mongoose
   .catch((err) => {
     console.log(err);
   });
-const cors = require('cors');
+app.use("/api/users", require("./Routes/UserRouter"));
+
 app.use(cors({
   origin: 'http://localhost:3000'
 }));

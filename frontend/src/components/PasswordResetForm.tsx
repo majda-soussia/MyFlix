@@ -22,7 +22,7 @@ const PasswordResetPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/MyFlix/confirmpassword/${id}`, {
+      const res = await fetch(`http://localhost:4000/api/users/confirmpassword/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ newpassword: newPassword, newpasswordComfirm: confirmPassword }),

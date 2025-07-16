@@ -1,18 +1,21 @@
 import React from "react";
+import styles from "./style/Home.module.css";
 import Sidebar from "../components/Sidebar.tsx";
 import Header from "../components/Header.tsx";
+import Trend from "../components/Trend.tsx";
+import Recomandation  from "../components/Recomandation.tsx";
 const Home:React.FC= () => {
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-    <Sidebar />
-    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      <Header />
+    <div className={styles.container}>
+      <Sidebar />
+      <div className={styles.content}>
+        <Header />
+        <div className={styles.scrollable}>
+          <Trend />
+          <Recomandation />
+        </div>
       </div>
-      </div>
-    
-    
-    
+    </div>
   );
 };
-
 export default Home;

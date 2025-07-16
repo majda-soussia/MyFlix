@@ -21,7 +21,7 @@ const SideBarItem: React.FC<SidebarItemProps> = ({
         alignItems: "center",
         padding: "12px 20px",
         cursor: isTitle ? "default" : "pointer",
-        backgroundColor: "black",
+        backgroundColor: " linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 94%, rgba(74, 13, 13, 1) 100%)",
         color: "white",
         fontWeight: active ? "bold" : "normal",
         justifyContent: isTitle ? "center" : "flex-start",

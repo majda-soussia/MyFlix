@@ -28,7 +28,7 @@ const Form: React.FC = () => {
 
     try {
 
-      const res = await fetch("http://localhost:4000/MyFlix/register", {
+      const res = await fetch("http://localhost:4000/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

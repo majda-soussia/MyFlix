@@ -16,7 +16,8 @@ module.exports = (mongoose) => {
     },
     {
       timestamps: true,
-    }
+    } ,
+   
   );
 
   FilmSchema.method("toJSON", function () {

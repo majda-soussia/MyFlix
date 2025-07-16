@@ -14,13 +14,13 @@ const Header: React.FC = () => {
   return (
     <header
       style={{
-        background: "black",
+        background:" linear-gradient(90deg,rgba(64, 8, 10, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 1) 100%)",
         color: "white",
-        padding: "10px 20px",
+        padding: "20px 20px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        borderBottom: "1px solid #333",
+        marginBottom: "0px",
       }}
     >
       <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>

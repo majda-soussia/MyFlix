@@ -7,6 +7,8 @@ import Welcome from './pages/welcome.tsx';
 import Register from './pages/Register.tsx';
 import Sendmail from "./pages/Sendmail.tsx";
 import PasswordReset from "./pages/PasswordReset.tsx";
+import Account from "./pages/AccountSetting.tsx";
+import FavoritesPage from "./pages/FavoritesPage.tsx";
 
 const App: React.FC =()=> {
   return (
@@ -18,6 +20,8 @@ const App: React.FC =()=> {
         <Route path="/register" element={<Register />} />
         <Route path="/FormMail" element={<Sendmail/>} />   
         <Route path="/confirmpassword/:id" element={<PasswordReset/>} />   
+        <Route path="/account/:id" element={<Account/>} /> 
+        <Route path="favorites/" element={<FavoritesPage />} />
          
       </Routes>
   </div>
