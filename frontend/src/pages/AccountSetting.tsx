@@ -9,7 +9,7 @@ const AccountSetting:React.FC= () => {
       <Sidebar />
       <div className={styles.content}>
         <Header />
-        <div >
+        <div className={styles.scrollable} >
           <Settings/>
         </div>
       </div>

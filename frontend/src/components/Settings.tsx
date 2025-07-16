@@ -22,18 +22,7 @@ const Settings = () => {
     setBirthday(currentUser.birthday);
     setGender(currentUser.gender);
   }, []);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Updated user:", {
-      firstname,
-      lastname,
-      email,
-      password,
-      confirmPassword,
-      birthday,
-      gender,
-    });
-  };
+  
 
   return (
     <div>

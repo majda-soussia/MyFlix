@@ -4,7 +4,7 @@ import Item from "./Item.tsx";
 import { trendingItems } from "../data/movies.ts";
 import ReactStars from "react-rating-stars-component";
 import { useNavigate } from "react-router-dom";
-const Trend: React.FC = () => {
+const ListMovies: React.FC = () => {
   type TrendingItem = {
     id: number;
     title: string;
@@ -77,17 +77,7 @@ const Trend: React.FC = () => {
           "linear-gradient(90deg,rgba(64, 8, 10, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 1) 100%)",
       }}
     >
-      <h2
-        style={{
-          color: "#ffffff",
-          fontSize: "28px",
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: "40px",
-        }}
-      >
-        Trending at this moment
-      </h2>
+      
       <div
         style={{
           position: "relative",
@@ -184,4 +174,4 @@ const navButtonStyle = (position: "left" | "right") => ({
     background: "#e64a19",
   },
 });
-export default Trend;
+export default ListMovies;

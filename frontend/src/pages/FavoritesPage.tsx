@@ -8,7 +8,7 @@ const FavoritesPage = () => {
       <Sidebar />
       <div className={styles.content}>
         <Header />
-        <div >
+        <div className={styles.scrollable} >
           
         </div>
       </div>
