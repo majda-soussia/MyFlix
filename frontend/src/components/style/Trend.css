@@ -1,8 +1,9 @@
 .trend-section {
     padding: 40px 5%;
-    background: linear-gradient(135deg, #0f0f0f 0%, #111 100%);
+    background:linear-gradient(90deg,rgba(64, 8, 10, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 1) 100%);
     position: relative;
     overflow: hidden;
+
   }
   
   .section-header {

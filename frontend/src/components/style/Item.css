@@ -45,9 +45,11 @@
     color: white;
     font-family: sans-serif;
   }
-  .item-rating {
-    color: gold;
-    font-size: 14px;
-    margin-top: 4px;
+  
+  .star-rating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
   }
   

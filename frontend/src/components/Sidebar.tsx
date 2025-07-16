@@ -15,7 +15,7 @@ export const Sidebar: React.FC = ()  => {
     { label: "Home", path: "/", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
-    { label: "Profile", path: "/profil", icon: "/images/profile.png" },
+    { label: "Account Settings", path: "/account/:id", icon: "/images/profile.png" },
   ];
   return (
     <div
