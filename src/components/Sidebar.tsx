@@ -8,6 +8,7 @@ type SidebarItemType = {
   isTitle?: boolean;
 };
 export const Sidebar: React.FC = ()  => {
+  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const location = useLocation();
   const items: SidebarItemType[] = [
@@ -15,7 +16,7 @@ export const Sidebar: React.FC = ()  => {
     { label: "Home", path: "/", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
-    { label: "Profile", path: "/profil", icon: "/images/profile.png" },
+    { label: "Profile", path: `/account/${userId}`, icon: "/images/profile.png" },
   ];
   return (
     <div
