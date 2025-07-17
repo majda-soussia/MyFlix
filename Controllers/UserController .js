@@ -115,14 +115,14 @@ exports.SendEmail = async (req, res) => {
       to: email,
       subject: "Reset your password",
       html: `
-        <p>Dear user,</p>
-        <p>We would like to inform you that a password reset event has been triggered for your account.</p>
-        <p>To complete the reset process and choose a new password, please click the following link:</p>
-        <a href="${url}">${url}</a>
-        <p>If you did not initiate this password reset request, please contact our support team immediately.</p>
-        <p>Thank you for your understanding and cooperation.</p>
-        <p>Best regards,</p>
-      `,
+      <p>Bonjour,</p>
+      <p>Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.</p>
+      <p>Veuillez cliquer sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
+      <p><a href="${url}" style="color: #1a73e8; text-decoration: underline;">Réinitialiser votre mot de passe</a></p>
+      <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email ou contacter notre support.</p>
+      <p>Cordialement,</p>
+      <p>L'équipe de support</p>
+    `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -167,6 +167,7 @@ exports.changePassword = async (req, res) => {
     return;
   }
 }
+
 exports.addToFavorites = async (req, res) => {
     try {
         const { userId, movieId } = req.body;
