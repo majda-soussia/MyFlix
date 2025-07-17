@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require('../Models/User')(mongoose);
 const nodemailer = require("nodemailer");
+
 const UserController = require("../Controllers/UserController ");
 
 //Get All users
@@ -22,10 +23,16 @@ router.delete("/:id",UserController.deleteUser);
 //Update a user by his ID
 router.patch("/:id",UserController.updateUser);
 
-//Send Email de reinitialisation
+//Send Email to change a password
 router.post("/sendemail", UserController.SendEmail);
-  
+
 //Change the password
 router.post("/confirmpassword/:id", UserController.changePassword);
+
+router.post("/favorites/add", UserController.addToFavorites); 
+
+router.post("/favorites/remove", UserController.removeFromFavorites);
+
+router.get("/favorites/:userId", UserController.getFavorites);
 
 module.exports=router;

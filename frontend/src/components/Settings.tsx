@@ -110,7 +110,6 @@ const Settings = () => {
             className="settings-form"
             onSubmit={(e) => {
               e.preventDefault();
-              // handle password update logic here
               console.log("Password changed:", { password, confirmPassword });
             }}
           >

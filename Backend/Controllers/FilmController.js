@@ -5,6 +5,7 @@ require("dotenv").config();
 const multer = require("multer");
 const path = require("path");
 
+
 exports.getAllFilms = async (req, res) => {
   const url = 'https://api.themoviedb.org/3/movie/popular?language=en-US&page=1';
   const options = {
@@ -16,49 +17,69 @@ exports.getAllFilms = async (req, res) => {
   };
 
   const genresMap = {
-    28: "Action",
-    12: "Aventure",
-    16: "Animation",
-    35: "Comédie",
-    80: "Crime",
-    99: "Documentaire",
-    18: "Drame",
-    10751: "Famille",
-    14: "Fantastique",
-    36: "Histoire",
-    27: "Horreur",
-    10402: "Musique",
-    9648: "Mystère",
-    10749: "Romance",
-    878: "Science-Fiction",
-    10770: "Téléfilm",
-    53: "Thriller",
-    10752: "Guerre",
-    37: "Western"
+    28: "Action", 12: "Aventure", 16: "Animation", 35: "Comédie",
+    80: "Crime", 99: "Documentaire", 18: "Drame", 10751: "Famille",
+    14: "Fantastique", 36: "Histoire", 27: "Horreur", 10402: "Musique",
+    9648: "Mystère", 10749: "Romance", 878: "Science-Fiction",
+    10770: "Téléfilm", 53: "Thriller", 10752: "Guerre", 37: "Western"
   };
 
   try {
     const response = await fetch(url, options);
     const data = await response.json();
 
-    const filteredFilms = data.results.map(film => {
+    for (const film of data.results) {
       const genreNames = film.genre_ids.map(id => genresMap[id]).filter(Boolean);
 
-      return {
-        id: film.id,
-        title: film.title,
-        description: film.overview,
-        image: `https://image.tmdb.org/t/p/w500${film.poster_path}`,
-        releaseDate: film.release_date,
-        rate: film.vote_average,
-        type: genreNames.join(', '),
-      };
-    });
+      const existingFilm = await Film.findOne({ title: film.title }); // avoid duplicates
+      if (!existingFilm) {
+        const newFilm = new Film({
+          title: film.title,
+          description: film.overview,
+          image:`https://image.tmdb.org/t/p/w500${film.poster_path}`,
+          releaseDate: film.release_date,
+          rate: film.vote_average,
+          genres: genreNames
+        });
+        await newFilm.save();
+      }
+    }
 
-    res.json(filteredFilms);
+    // Always return films from MongoDB
+    const allFilms = await Film.find();
+    res.status(200).json(allFilms);
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de la récupération des films" });
+    res.status(500).json({ error: "Erreur lors de la récupération ou sauvegarde des films." });
+  }
+};
+
+exports.updateFilm = async (req, res) => {
+  const filmId = req.params.id;
+  const { title, description, image, releaseDate, rate, genres } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(filmId)) {
+    return res.status(400).json({ error: "Invalid film ID." });
+  }
+  try {
+    const updatedFilm = await Film.findByIdAndUpdate(
+      filmId,
+      { title, description, image, releaseDate, rate, genres },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedFilm) {
+      return res.status(404).json({ error: "Film not found in database." });
+    }
+
+    res.status(200).json({
+      message: "✅ Film updated successfully!",
+      film: updatedFilm,
+    });
+  } catch (err) {
+    console.error("❌ Error updating film:", err.message);
+    res.status(500).json({ error: "Failed to update film." });
   }
 };
 
@@ -179,7 +200,7 @@ exports.createFilm = async (req, res) => {
     return res.status(400).json({ error: "All fields are required." });
   }
 
-  const imagePath = req.file ? `Uploads/${req.file.filename}` : "";
+  const imagePath = req.file ?` Uploads/${req.file.filename}` : "";
 
   try {
     const film = new Film({
@@ -194,5 +215,26 @@ exports.createFilm = async (req, res) => {
     res.status(201).json(film);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+exports.deleteFilm = async (req, res) => {
+  const filmId = req.params.id;
+
+  // Check if the ID is valid
+  if (!mongoose.Types.ObjectId.isValid(filmId)) {
+    return res.status(400).json({ error: "Invalid film ID." });
+  }
+
+  try {
+    const deletedFilm = await Film.findByIdAndDelete(filmId);
+
+    if (!deletedFilm) {
+      return res.status(404).json({ error: "Film not found." });
+    }
+
+    res.status(200).json({ message: "✅ Film deleted successfully." });
+  } catch (err) {
+    console.error("❌ Error deleting film:", err.message);
+    res.status(500).json({ error: "Failed to delete film." });
   }
 };

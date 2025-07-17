@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const User = require("../Models/User")(mongoose);
 const nodemailer = require("nodemailer");
 
+const Film = require("../Models/Film")(mongoose);
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -52,7 +53,8 @@ exports.createUser = async (req, res) => {
       lastname,
       password: hashedPassword,
       birthday,
-      gender
+      gender,
+      favorites: []
     });
 
     await newUser.save();
@@ -102,51 +104,57 @@ exports.updateUser = async (req, res) => {
 
 exports.SendEmail = async (req, res) => {
   const { email } = req.body;
-  if(!email){
-    res.status(400).json("Email is required");
-      return;
+
+  if (!email) {
+    return res.status(400).json("Email is required");
   }
-  const user = await User.findOne({ email }); //nlawj aal mail fl database
-  if (user){
-    const url = `http://localhost:3000/confirmpassword/${user._id}`;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json("This email does not exist");
+    }
+
+    // Encodage sécurisé de l'ID
+    const encodedId = encodeURIComponent(user._id.toString());
+    const url = `http://localhost:3000/confirmpassword/${encodedId}`;
+
     const transporter = nodemailer.createTransport({
-    service: "gmail",
+      service: "gmail",
       auth: {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD,
       },
     });
-     const mailOptions = {
-      from: "sirineraies20@gmail.com",
+
+    const mailOptions = {
+      from: process.env.EMAIL,
       to: email,
       subject: "Reset your password",
-      html: `Dear user,
-        <br/><br/>
-        We would like to inform you that a password reset event has been triggered for your account. To complete the reset process and choose a new password, please click on the following link: ${url}.
-        <br/><br/>
-        This link will redirect you to a page where you can enter your new password. We recommend choosing a strong password and keeping it confidential to ensure the security of your account.
-        <br/><br/>
-        If you did not initiate this password reset request, please contact our support team immediately so we can take the necessary steps to secure your account.
-        <br/><br/>
-        If you have any questions or technical issues, feel free to contact us. We are here to help you at any time.
-        <br/><br/>
-        Thank you for your understanding and cooperation.
-        <br/>
-        Best regards,`,
-     };
+      html: `
+        <p>Dear user,</p>
+        <p>We would like to inform you that a password reset event has been triggered for your account.</p>
+        <p>To complete the reset process and choose a new password, please click the following link:</p>
+        <a href="${url}">${url}</a>
+        <p>If you did not initiate this password reset request, please contact our support team immediately.</p>
+        <p>Thank you for your understanding and cooperation.</p>
+        <p>Best regards,</p>
+      `,
+    };
 
-     transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
-        res.status(400).json("An error occurred while sending the email");
-      }else {
-        res.status(200).json(" An email has been sent successfully");
-      }})
-    }
-    else {
-      res.status(400).json(" this email does not exist");
-    } 
-}
+        res.status(500).json("An error occurred while sending the email");
+      }
+        res.status(200).json({ message: "Email sent successfully", info });
+      });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res.status(500).json("Internal server error");
+  }
+};
+
 
 exports.changePassword = async (req, res) => {
    const {newpassword,newpasswordComfirm} = req.body
@@ -175,6 +183,73 @@ res.status(200).json({ message: "Password updated successfully." });
    return;
   } catch (error) {
     res.status(400).json({ error: error.message })
- return;
+    return;
+  }
 }
-}
+exports.addToFavorites = async (req, res) => {
+    try {
+        const { userId, movieId } = req.body;
+
+        // Validation des IDs
+      if (!userId || !movieId) {
+      return res.status(400).json({ error: "User ID and Movie ID are required" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favorites: movieId } }, // Évite les doublons
+      { new: true }
+    );
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Movie added to favorites",
+            favorites: user.favorites 
+        });
+    } catch (err) {
+        console.error("Error in addToFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.removeFromFavorites = async (req, res) => {
+    try {
+        const { userId, movieId } = req.body;
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $pull: { favorites: movieId } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Movie removed from favorites",
+            favorites: user.favorites 
+        });
+    } catch (err) {
+        console.error("Error in removeFromFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.getFavorites = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ favorites: user.favorites });
+    } catch (err) {
+        console.error("Error in getFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};

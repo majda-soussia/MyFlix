@@ -4,8 +4,6 @@ import { getRandomAvatar } from "../data/avatars.ts";
 import { users } from "../data/users.ts";
 import EmojiPicker from "emoji-picker-react";
 import { EmojiClickData } from "emoji-picker-react";
-import { FaRegSmile } from "react-icons/fa";
-
 type Movie = {
   id: number;
   title: string;
@@ -37,6 +35,8 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
     gender: "male" | "female";
     avatar: string;
     userName: string;
+    createdAt?: string;
+
   };
   const [comment, setComment] = useState("");
 
