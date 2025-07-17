@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "../components/style/Item.css";
 
 type ItemProps = {
@@ -8,6 +8,7 @@ type ItemProps = {
   rate: number;
   genres: string[];
   onClick: (id: number) => void;
+  onHeartClick: (id: number) => void; // Nouvelle prop pour le clic sur le cœur
 };
 
 const Item: React.FC<ItemProps> = ({
@@ -15,43 +16,39 @@ const Item: React.FC<ItemProps> = ({
   title,
   image,
   rate,
-  genres = [], // valeur par défaut vide
+  genres,
   onClick,
+  onHeartClick,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const handleHeartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFavorite((prev) => !prev);
-  };
-
-  const handleClick = () => {
-    onClick(id);
+    console.log("Film ID cliqué:", id); // Affiche l'ID dans la console
+    onHeartClick(id); // Transmet l'ID au composant parent
   };
 
   return (
-    <div className="item-card" onClick={handleClick}>
-      <img className="item-image" src={image} alt={title} />
-
-      <button className="heart-icon" onClick={toggleFavorite}>
+    <div className="item-card" onClick={() => onClick(id)}>
+      <img
+        className="item-image"
+        src={image || '/images/placeholder.jpg'}
+        alt={title}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+        }}
+      />
+      <button className="heart-icon" onClick={handleHeartClick}>
         <img
-          src={
-            isFavorite
-              ? "/images/fullheart1.png"
-              : "/images/emptyheart1.png"
-          }
+          src="/images/emptyheart1.png" // Vous pouvez gérer l'état du cœur ici
           alt="favorite"
         />
       </button>
-
-    <div className="item-info">
-      <h3>{title}</h3>
-      <p>{Array.isArray(genres) ? genres.join(", ") : "Genre inconnu"}</p>
-      <p className="text-sm text-yellow-400">
-        ⭐ {typeof rate === "number" ? rate.toFixed(1) : "N/A"}
-      </p>
-    </div>
-
+      <div className="item-info">
+        <h3>{title}</h3>
+        <p>{genres?.join(", ") || "Genre inconnu"}</p>
+        <p className="text-sm text-yellow-400">
+          ⭐ {typeof rate === 'number' ? rate.toFixed(1) : 'N/A'}
+        </p>
+      </div>
     </div>
   );
 };
