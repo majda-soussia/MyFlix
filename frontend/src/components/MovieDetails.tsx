@@ -7,9 +7,9 @@ import { EmojiClickData } from "emoji-picker-react";
 type Movie = {
   id: number;
   title: string;
-  imageUrl: string;
-  rating: number;
-  type: string;
+  image: string;
+  rate: number;
+  genres: string[];
   year?: number;
   duration?: string;
   description?: string;
@@ -36,20 +36,21 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
     avatar: string;
     userName: string;
     createdAt?: string;
-
   };
   const [comment, setComment] = useState("");
 
-  const [movieComments, setMovieComments] = useState<{ [movieId: number]: Comment[] }>(() => {
+  const [movieComments, setMovieComments] = useState<{
+    [movieId: number]: Comment[];
+  }>(() => {
     const saved = localStorage.getItem("movieComments");
     return saved ? JSON.parse(saved) : {};
   });
-  
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   useEffect(() => {
     localStorage.setItem("movieComments", JSON.stringify(movieComments));
   }, [movieComments]);
-  
+
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (comment.trim()) {
@@ -108,7 +109,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
     >
       <div style={{ flex: "0 0 320px" }}>
         <img
-          src={movie.imageUrl}
+          src={movie.image}
           alt={movie.title}
           style={{
             width: "100%",
@@ -153,7 +154,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
         </div>
         <div style={{ justifyItems: "self-start" }}>
           <p style={{ color: "#ccc", marginBottom: "8px" }}>
-            {movie.year || "2024"} &nbsp;|&nbsp; {movie.type || "Genre"}{" "}
+            {movie.year || "2024"} &nbsp;|&nbsp; {movie.genres || "Genre"}{" "}
             &nbsp;|&nbsp; {movie.duration || "2h 30m"}
           </p>
 
@@ -175,7 +176,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
             <ReactStars
               count={5}
               size={30}
-              value={movie.rating / 2}
+              value={movie.rate / 2}
               edit={false}
               activeColor="#ffd700"
             />
@@ -283,7 +284,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
                   <li
                     key={idx}
                     style={{
-                      width:"800px",
+                      width: "800px",
                       height: "100px",
                       display: "flex",
                       alignItems: "flex-start",

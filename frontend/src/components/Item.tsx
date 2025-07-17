@@ -9,6 +9,7 @@ type ItemProps = {
   genres: string[];
   onClick?: (id: number) => void;
   onHeartClick: (id: number) => void;
+  isFavorite: boolean;
 };
 
 const Item: React.FC<ItemProps> = ({
@@ -19,8 +20,9 @@ const Item: React.FC<ItemProps> = ({
   genres,
   onClick,
   onHeartClick,
+  isFavorite
 }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [Favorite, setFavorite] = useState(false);
 
   const handleClick = () => {
     if (onClick) onClick(id);

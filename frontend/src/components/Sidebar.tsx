@@ -12,7 +12,7 @@ export const Sidebar: React.FC = ()  => {
   const location = useLocation();
   const items: SidebarItemType[] = [
     { label: "WATCH", path: "/", icon: "/images/watch.png", isTitle: true },
-    { label: "Home", path: "/", icon: "/images/home.png" },
+    { label: "Home", path: "/home", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
     { label: "Account Settings", path: "/account/:id", icon: "/images/profile.png" },

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MovieDetails from "./MovieDetails.tsx";
 import Item from "./Item.tsx";
-import { trendingItems } from "../data/movies.ts";
 import { useNavigate } from "react-router-dom";
 const Trend: React.FC = () => {
   type TrendingItem = {

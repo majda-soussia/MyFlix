@@ -23,8 +23,8 @@ const App: React.FC = () => {
         <Route path="/FormMail" element={<Sendmail />} />
         <Route path="/confirmpassword/:id" element={<PasswordReset />} />
         <Route path="/account/:id" element={<Account />} />
-        <Route path="favorites/" element={<FavoritesPage />} />
-        <Route path="movie/:id" element={<MovieDetailsPage />} />
+        <Route path="/favorites/" element={<FavoritesPage />} />
+        <Route path="/movie/:id" element={<MovieDetailsPage />} />
       </Routes>
     </div>
   );
