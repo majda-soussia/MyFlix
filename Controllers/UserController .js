@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const User = require("../Models/User")(mongoose);
 const nodemailer = require("nodemailer");
 const Film = require("../Models/Film")(mongoose);
+const jwt = require("jsonwebtoken");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -22,6 +23,26 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const sendEmail = async (to, subject, html) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to,
+    subject,
+    html,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
 
 exports.createUser = async (req, res) => {
   try {
@@ -45,17 +66,46 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       birthday,
       gender,
-      favorites: []
+      favorites: [],
+      isVerified: false
     });
 
     await newUser.save();
 
-    const userToReturn = newUser.toJSON();
-    res.status(201).json(userToReturn);
+    const verificationToken = jwt.sign(
+      { userId: newUser._id, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const verificationUrl = `http://localhost:3000/login`;
+
+    await sendEmail(
+      email,
+     "Vérification de votre compte",
+      `
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+          <p>Bonjour ${firstname},</p>
+          <p>Merci de vous être inscrit. Veuillez vérifier votre compte en cliquant sur le lien ci-dessous :</p>
+          <p>
+            <a href="${verificationUrl}" style="background-color: #007BFF; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+              Vérifier mon compte
+            </a>
+          </p>
+          <p>Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.</p>
+          <p>Merci,</p>
+          <p>L’équipe Support</p>
+        </div>
+      `
+    );
+
+    res.status(201).json({ message: "User registered. Please check your email." });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.deleteUser = async (req, res) => {
   try {
     const deleteUser = await User.findByIdAndDelete(req.params.id);
@@ -83,6 +133,7 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 exports.SendEmail = async (req, res) => {
   const { email } = req.body;
@@ -139,6 +190,24 @@ exports.SendEmail = async (req, res) => {
     return res.status(500).json("Internal server error");
   }
 };
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(payload.id);
+    if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
+
+    user.isVerified = true;
+    await user.save();
+
+    res.status(200).json({ message: "Email vérifié avec succès" });
+  } catch (err) {
+    res.status(400).json({ error: "Token invalide ou expiré" });
+  }
+};
+
 
 
 exports.changePassword = async (req, res) => {
