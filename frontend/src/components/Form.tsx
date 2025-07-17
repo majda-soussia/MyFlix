@@ -16,7 +16,7 @@ const Form: React.FC = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/MyFlix/login", {
+      const res = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,9 +28,8 @@ const Form: React.FC = () => {
 
       if (res.ok) {
         alert("✅ Login successful!");
-        // Optional: Save token to localStorage or context
-        // localStorage.setItem('token', data.token);
-        navigate("/home"); // or whatever page you want after login
+       
+        navigate("/home");
       } else {
         alert("❌ " + (data.error || data.message || "Login failed"));
       }

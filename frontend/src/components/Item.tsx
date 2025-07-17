@@ -4,34 +4,43 @@ import ReactStars from "react-rating-stars-component";
 type ItemProps = {
   id: number;
   title: string;
-  imageUrl: string;
-  rating?: number;
-  type?: string;
+  image: string;
+  rate: number;
+  genres: string[];
   onClick?: (id: number) => void;
+  onHeartClick: (id: number) => void;
 };
 
 const Item: React.FC<ItemProps> = ({
   id,
   title,
-  imageUrl,
-  rating,
-  type,
+  image,
+  rate,
+  genres,
   onClick,
+  onHeartClick,
 }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsFavorite((prev) => !prev);
-  };
   const handleClick = () => {
     if (onClick) onClick(id);
   };
+  const handleHeartClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      console.log("Film ID cliqué:", id); // Affiche l'ID dans la console
+      onHeartClick(id); // Transmet l'ID au composant parent
+    };
   return (
     <div className="item-card" onClick={handleClick}>
-      <img className="item-image" src={imageUrl} alt={title} />
-
-      <button className="heart-icon" onClick={toggleFavorite}>
+     <img
+        className="item-image"
+        src={image || '/images/placeholder.jpg'}
+        alt={title}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+        }}
+      />
+      <button className="heart-icon" onClick={handleHeartClick}>
         <img
           src={
             isFavorite ? "/images/fullheart1.png" : "/images/emptyheart1.png"
@@ -42,13 +51,13 @@ const Item: React.FC<ItemProps> = ({
 
       <div className="item-info">
         <h3>{title}</h3>
-        <p>{type}</p>
+        <p>{genres?.join(", ") || "Genre inconnu"}</p>
         <div className="star-rating">
-          {rating !== undefined && (
+          {rate !== undefined && (
             <ReactStars
               count={5}
               size={24}
-              value={rating ? rating / 2 : 0}
+              value={rate ? rate / 2 : 0}
               edit={false}
               isHalf={true}
               activeColor="gold"

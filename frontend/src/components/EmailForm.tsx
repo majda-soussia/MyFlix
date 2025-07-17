@@ -13,7 +13,7 @@ const EmailForm: React.FC = () => {
     }
 
     try {
-    const res = await fetch('http://localhost:4000/MyFlix/sendemail', {
+    const res = await fetch('http://localhost:4000/api/users/sendemail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
