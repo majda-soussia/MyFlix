@@ -28,4 +28,10 @@ router.post("/sendemail", UserController.SendEmail);
 //Change the password
 router.post("/confirmpassword/:id", UserController.changePassword);
 
+router.post("/favorites/add", UserController.addToFavorites); 
+
+router.post("/favorites/remove", UserController.removeFromFavorites);
+
+router.get("/favorites/:userId", UserController.getFavorites);
+
 module.exports = router;

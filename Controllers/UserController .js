@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const User = require("../Models/User")(mongoose);
 const nodemailer = require("nodemailer");
+const Film = require("../Models/Film")(mongoose);
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -41,7 +42,8 @@ exports.createUser = async (req, res) => {
       lastname,
       password: hashedPassword,
       birthday,
-      gender
+      gender,
+      favorites: []
     });
 
     await newUser.save();
@@ -162,3 +164,70 @@ exports.changePassword = async (req, res) => {
     return;
   }
 }
+exports.addToFavorites = async (req, res) => {
+    try {
+        const { userId, movieId } = req.body;
+
+        // Validation des IDs
+      if (!userId || !movieId) {
+      return res.status(400).json({ error: "User ID and Movie ID are required" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favorites: movieId } }, // Évite les doublons
+      { new: true }
+    );
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Movie added to favorites",
+            favorites: user.favorites 
+        });
+    } catch (err) {
+        console.error("Error in addToFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.removeFromFavorites = async (req, res) => {
+    try {
+        const { userId, movieId } = req.body;
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $pull: { favorites: movieId } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Movie removed from favorites",
+            favorites: user.favorites 
+        });
+    } catch (err) {
+        console.error("Error in removeFromFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.getFavorites = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ favorites: user.favorites });
+    } catch (err) {
+        console.error("Error in getFavorites:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
