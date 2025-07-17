@@ -20,7 +20,7 @@ router.post("/register", UserController.createUser);
 router.delete("/:id",UserController.deleteUser);
 
 //Update a user by his ID
-router.patch("/:id",UserController.updateUser);
+router.put("/:id",UserController.updateUser);
 
 //Send Email to change a password
 router.post("/sendemail", UserController.SendEmail);

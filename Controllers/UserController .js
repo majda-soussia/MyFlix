@@ -12,6 +12,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -21,6 +22,7 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.createUser = async (req, res) => {
   try {
     const { email, firstname, lastname, password, birthday, gender } = req.body;
@@ -65,6 +67,7 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.updateUser = async (req, res) => {
   try {
     const updates = req.body;
