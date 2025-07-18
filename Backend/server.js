@@ -2,7 +2,7 @@ const express = require("express");
 const database = require("./Database/Database.js");
 const path = require("path");
 require("dotenv").config();
-
+const cors = require("cors")
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

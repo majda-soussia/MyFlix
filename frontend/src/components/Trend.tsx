@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import MovieDetails from "./MovieDetails.tsx";
+import MovieDetails from "../pages/MovieDetailsPage.tsx";
 import Item from "./Item.tsx";
 import { useNavigate } from "react-router-dom";
 const Trend: React.FC = () => {
@@ -128,7 +128,7 @@ const Trend: React.FC = () => {
                 }
                 rate={item.rate}
                 genres={item.genres}
-                onClick={handleClick}
+                onClick={() => handleClick(item.id)}
                 onHeartClick={handleHeartClick}
                 isFavorite={favorites.includes(item.id)}
               />
@@ -162,17 +162,10 @@ const Trend: React.FC = () => {
       </div>
       <div>
         {selectedMovie && (
-          <MovieDetails
-          movie={selectedMovie}
-          onClose={() => setSelectedMovie(null)}
-          isFavorite={favorites.includes(selectedMovie.id)}
-          toggleFavorite={() => handleHeartClick(selectedMovie.id)}
-          userRating={userRating}
-          setUserRating={setUserRating}
-          />
+          <MovieDetails/>
         )}
       </div>
-    </div>
+      </div>
   );
 };
 const navButtonStyle = (position: "left" | "right") => ({

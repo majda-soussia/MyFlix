@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const query = e.currentTarget.value.trim();
-      if (query) {
-        navigate(`/search?q=${encodeURIComponent(query)}`);
-      }
+  if (e.key === "Enter") {
+    const query = e.currentTarget.value.trim();
+    if (query) {
+      navigate(`/search/${encodeURIComponent(query)}`);
     }
+  }
   };
   return (
     <header
@@ -51,8 +51,14 @@ const Header: React.FC = () => {
           alt="search"
           title="search"
           style={{ width: 24, height: 24, cursor: "pointer" }}
-          onClick={() => navigate("/search")}
+          onClick={() => {
+            const query = (document.querySelector("input[placeholder='Search...']") as HTMLInputElement)?.value?.trim();
+            if (query) {
+              navigate(`/search/${encodeURIComponent(query)}`);
+            }
+          }}
         />
+
         <img
           src="/images/favoris.png"
           alt="Favorites"
@@ -65,7 +71,7 @@ const Header: React.FC = () => {
           alt="Account"
           title="My Account"
           style={{ width: 24, height: 24, cursor: "pointer" }}
-          onClick={() => navigate("/account/:id")}
+          onClick={() => navigate(`/account/${localStorage.getItem("userId")}`)}
         />
       </div>
     </header>

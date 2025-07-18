@@ -27,8 +27,9 @@ const Form: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
+        console.log(data)
         alert("✅ Login successful!");
-       
+       localStorage.setItem("userId",data.user._id)
         navigate("/home");
       } else {
         alert("❌ " + (data.error || data.message || "Login failed"));

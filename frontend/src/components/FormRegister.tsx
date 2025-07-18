@@ -39,14 +39,20 @@ const Form: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ Registered successfully!");
-        navigate("/login");
-      } else {
-alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong.");
+        alert("✅ Inscription réussie ! Veuillez vérifier votre e-mail 📩");
+        setEmail("");
+        setFirstname("");
+        setLastname("");
+        setPassword("");
+        setConfirmPassword("");
+        setBirthday("");
+        setGender("");
+        } else {
+          alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
+        }
+        } catch (error) {
+         console.error(error);
+         alert("Something went wrong.");
     }
   };
 

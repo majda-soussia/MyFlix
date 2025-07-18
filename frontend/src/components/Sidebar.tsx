@@ -8,14 +8,15 @@ type SidebarItemType = {
   isTitle?: boolean;
 };
 export const Sidebar: React.FC = ()  => {
+  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const location = useLocation();
   const items: SidebarItemType[] = [
     { label: "WATCH", path: "/", icon: "/images/watch.png", isTitle: true },
-    { label: "Home", path: "/home", icon: "/images/home.png" },
+    { label: "Home", path: "/", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
-    { label: "Account Settings", path: "/account/:id", icon: "/images/profile.png" },
+    { label: "Profile", path: `/account/${userId}`, icon: "/images/profile.png" },
   ];
   return (
     <div
@@ -47,7 +48,7 @@ export const Sidebar: React.FC = ()  => {
           label="Logout"
           icon="/images/logout.png"
           onClick={() => {
-            navigate("/welcome");
+            navigate("/login");
           }}
           active={false}
         />

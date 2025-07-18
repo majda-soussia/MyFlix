@@ -14,5 +14,5 @@ router.get("/genre/:genres",FilmController.getFilmByType)
 
 //Create a film
 router.post("/addFilm", FilmController.upload.single("image"), FilmController.createFilm);
-
+router.get("/films/:id", FilmController.getFilmById);
 module.exports = router;

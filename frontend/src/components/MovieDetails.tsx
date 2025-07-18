@@ -1,9 +1,16 @@
 import React, { useState, useMemo, useEffect } from "react";
 import ReactStars from "react-rating-stars-component";
 import { getRandomAvatar } from "../data/avatars.ts";
-import { users } from "../data/users.ts";
 import EmojiPicker from "emoji-picker-react";
 import { EmojiClickData } from "emoji-picker-react";
+import { useParams } from "react-router-dom";
+type Comment = {
+  text: string;
+  gender: "male" | "female";
+  avatar: string;
+  userName: string;
+  createdAt?: string;
+};
 type Movie = {
   id: number;
   title: string;
@@ -14,51 +21,76 @@ type Movie = {
   duration?: string;
   description?: string;
 };
-
-interface MovieDetailsProps {
-  movie: Movie;
-  onClose?: () => void;
-  isFavorite?: boolean;
-  toggleFavorite?: (e: React.MouseEvent) => void;
-  userRating?: number | null;
-  setUserRating?: (rating: number) => void;
-}
-
-const MovieDetails: React.FC<MovieDetailsProps> = ({
-  movie,
-  onClose,
-  userRating = null,
-  setUserRating = () => {},
-}) => {
-  type Comment = {
-    text: string;
-    gender: "male" | "female";
-    avatar: string;
-    userName: string;
-    createdAt?: string;
-  };
+const MovieDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
-
-  const [movieComments, setMovieComments] = useState<{
-    [movieId: number]: Comment[];
-  }>(() => {
+  const [movieComments, setMovieComments] = useState<{ [movieId: number]: Comment[] }>(() => {
     const saved = localStorage.getItem("movieComments");
     return saved ? JSON.parse(saved) : {};
   });
-
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      console.error("❌ No movie ID in URL.");
+      return;
+    }
+  
+    console.log("📡 Fetching movie with ID:", id);
+  
+    fetch(`http://localhost:4000/api/films/${id}`)
+      .then((res) => {
+        console.log("➡️ Response status:", res.status);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ Movie fetched:", data);
+        setMovie(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load movie:", err);
+        setLoading(false);
+      });
+  }, [id]);
+  
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("movieComments", JSON.stringify(movieComments));
+  }, [movieComments]);
+  
+  const currentUser = useMemo(() => {
+    const stored = localStorage.getItem("currentUser");
+    return stored ? JSON.parse(stored) : null;
+  }, []);
+  
+  const gender = (currentUser?.gender || "male") as "male" | "female";
+
+  const userAvatar = useMemo(() => getRandomAvatar(gender), [gender]);
+
   useEffect(() => {
     localStorage.setItem("movieComments", JSON.stringify(movieComments));
   }, [movieComments]);
 
   const handleCommentSubmit = (e: React.FormEvent) => {
+
     e.preventDefault();
+    if (!movie) return;
     if (comment.trim()) {
       const newComment: Comment = {
         text: comment.trim(),
         gender,
         avatar: userAvatar,
-        userName: `${currentUser.firstname} ${currentUser.lastname}`,
+        userName: `${currentUser?.firstname ?? "Anonymous"} ${currentUser?.lastname ?? ""}`,
       };
 
       setMovieComments((prev) => {
@@ -77,21 +109,25 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
   const handleEmojiClick = (emojiData: EmojiClickData) => {
     setComment((prev) => prev + emojiData.emoji);
   };
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const [isFavorite, setIsFavorite] = useState(false);
-
   const toggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFavorite((prev) => !prev);
   };
-  const currentUser = users[1];
-  const gender = currentUser.gender as "male" | "female";
-  const userAvatar = useMemo(() => getRandomAvatar(gender), [gender]);
+  if (loading) {
+    return <p style={{ color: "white" }}>Loading movie details...</p>;
+  }
+
+  if (!movie) {
+    return <p style={{ color: "white" }}>Movie not found.</p>;
+  }
+  if (!currentUser) {
+    return <p style={{ color: "white" }}>Please log in to comment or rate the movie.</p>;
+  }
   return (
     <div
       style={{
