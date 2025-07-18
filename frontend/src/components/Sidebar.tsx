@@ -10,12 +10,14 @@ type SidebarItemType = {
 export const Sidebar: React.FC = ()  => {
   const navigate = useNavigate();
   const location = useLocation();
+  const userId = localStorage.getItem("userId"); // Assuming you save this at login
+
   const items: SidebarItemType[] = [
-    { label: "WATCH", path: "/", icon: "/images/watch.png", isTitle: true },
+    { label: "WATCH", path: "/watch", icon: "/images/watch.png", isTitle: true },
     { label: "Home", path: "/", icon: "/images/home.png" },
-    { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
+    { label: "Favourites", path: "/favourites", icon: "public/images/fav.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
-    { label: "Account Settings", path: "/account/:id", icon: "/images/profile.png" },
+    { label: "Account Settings",  path: userId ? `/account/${userId}`:"/login", icon: "/images/profile.png" },
   ];
   return (
     <div

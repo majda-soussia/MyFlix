@@ -1,8 +1,20 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./style/Form.css";
 
-const Form: React.FC = () => {
+type RegisterData = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  birthday: string;
+  gender: string;
+};
+
+type Props = {
+  onRegister?: (data: RegisterData) => void;
+};
+
+const FormRegister: React.FC<Props> = ({ onRegister }) => {
   const [email, setEmail] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -11,12 +23,10 @@ const Form: React.FC = () => {
   const [birthday, setBirthday] = useState("");
   const [gender, setGender] = useState("");
 
-  const navigate = useNavigate();
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email ||  !firstname || !lastname|| !password || !confirmPassword || !birthday || !gender) {
+    if (!email || !firstname || !lastname || !password || !confirmPassword || !birthday || !gender) {
       alert("Please fill in all the fields!");
       return;
     }
@@ -27,22 +37,23 @@ const Form: React.FC = () => {
     }
 
     try {
-
       const res = await fetch("http://localhost:4000/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email , firstname, lastname, password,confirmPassword,  birthday, gender }),
+        body: JSON.stringify({ email, firstname, lastname, password, birthday, gender }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         alert("✅ Registered successfully!");
-        navigate("/login");
+        if (onRegister) {
+          onRegister({ firstname, lastname, email, password, birthday, gender });
+        }
       } else {
-alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
+        alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
       }
     } catch (error) {
       console.error(error);
@@ -53,42 +64,30 @@ alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
   return (
     <div>
       <form onSubmit={handleSubmit}>
-         <div>
+        <div>
           <label>Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
         </div>
         <div>
           <label>First Name</label>
-          <input type ="text" value={firstname} onChange={(e) => setFirstname(e.target.value)} placeholder="First name" />
+          <input type="text" value={firstname} onChange={(e) => setFirstname(e.target.value)} placeholder="First name" />
         </div>
-
         <div>
           <label>Last Name</label>
           <input type="text" value={lastname} onChange={(e) => setLastname(e.target.value)} placeholder="Last name" />
         </div>
-
-       
-
         <div>
           <label>Password</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
         </div>
-
         <div>
           <label>Confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm password"
-          />
+          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" />
         </div>
-
         <div>
           <label>Date of Birth</label>
           <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} />
         </div>
-
         <div>
           <label>Gender</label>
           <select value={gender} onChange={(e) => setGender(e.target.value)}>
@@ -115,4 +114,4 @@ alert("❌ Error: " + (data.error || data.message || JSON.stringify(data)));
   );
 };
 
-export default Form;
+export default FormRegister;

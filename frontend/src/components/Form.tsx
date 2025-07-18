@@ -19,7 +19,7 @@ const Form: React.FC = () => {
       const res = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", 
         },
         body: JSON.stringify({ email, password }),
       });
@@ -28,6 +28,7 @@ const Form: React.FC = () => {
 
       if (res.ok) {
         alert("✅ Login successful!");
+
         // Optional: Save token to localStorage or context
         // localStorage.setItem('token', data.token);
         navigate("/home"); // or whatever page you want after login

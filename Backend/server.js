@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const database = require("./Database/Database.js");
 const path = require("path");
 require("dotenv").config();
@@ -15,11 +16,12 @@ database.mongoose
   .catch((err) => {
     console.log(err);
   });
-app.use("/api/users", require("./Routes/UserRouter"));
-
-app.use(cors({
+  app.use(cors({
   origin: 'http://localhost:3000'
 }));
+
+app.use("/api/users", require("./Routes/UserRouter"));
+
 
 const UserRoutes = require("./Routes/UserRouter.js");
 const FilmRoutes = require('./Routes/FilmRouter.js');
@@ -28,6 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use("/api/users",UserRoutes);
 app.use("/api/auth", require("./Routes/AuthRouter.js"));
 app.use("/api/films", FilmRoutes);
+app.use("/api/comments", require("./Routes/CommentRouter.js"));
 
 
 app.listen(process.env.PORT, () => {

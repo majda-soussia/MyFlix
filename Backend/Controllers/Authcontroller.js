@@ -17,12 +17,13 @@ exports.loginUser=async(req,res)=>{
         if (!isMatch){
             return res.status(401).json({error:'Invalide email '});
         }
+        //generate token
         const token=jwt.sign(
             {id:user.id,email:user.email},
             JWT_SECRET,
             {expiresIn:"1h"}
         );
-        res.status(200).json({message:'Login succesuful',token });
+res.status(200).json({ message: 'Login successful', token, userId: user._id });
 }catch (err){
     res.status(500).json({error:err.message});
 }

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "./style/Register.css";
 
 type RegisterData = {
-  nom: string;
-  prenom: string;
+  firstname: string;
+  lastname: string;
   email: string;
   password: string;
   birthday: string;
@@ -14,8 +14,8 @@ type RegisterData = {
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const handleLogin = ({
-    nom,
-    prenom,
+    firstname,
+    lastname,
     email,
     password,
     birthday,
@@ -23,19 +23,19 @@ const Register: React.FC = () => {
   }: RegisterData) => {
     console.log(
       "login attempt:",
-      nom,
-      prenom,
+      firstname,
+      lastname,
       email,
       password,
       birthday,
       gender
     );
-    alert(`welcome,${nom}!`);
+    alert(`welcome,${firstname}!`);
     navigate("/login");
   };
   return (
     <div className="register">
-      <FormRegister  />
+<FormRegister onRegister={handleLogin} />
     </div>
   );
 };
