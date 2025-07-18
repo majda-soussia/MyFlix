@@ -1,9 +1,6 @@
 const { Schema } = require("mongoose");
 
 module.exports = (mongoose) => {
-  if (mongoose.models.User) {
-    return mongoose.models.User;
-  }
   const UserSchema = new Schema(
     {
       email: {
@@ -19,9 +16,17 @@ module.exports = (mongoose) => {
       birthday: { type: Date, required: true },
       gender: {
         type: String,
-        enum: ["Male", "Female"],
+        enum: ["Male", "Female", "other"],
         required: true,
       },
+     favorites: [{
+    type: String,
+    default: [],
+    validate: {
+      validator: (favs) => favs.every(fav => mongoose.isValidObjectId(fav)),
+      message: "Invalid movie ID in favorites"
+    }
+  }]
     },
     {
       timestamps: true,

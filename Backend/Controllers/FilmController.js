@@ -36,7 +36,7 @@ exports.getAllFilms = async (req, res) => {
         const newFilm = new Film({
           title: film.title,
           description: film.overview,
-          image: `https://image.tmdb.org/t/p/w500${film.poster_path}`,
+          image:`https://image.tmdb.org/t/p/w500${film.poster_path}`,
           releaseDate: film.release_date,
           rate: film.vote_average,
           genres: genreNames
@@ -62,7 +62,6 @@ exports.updateFilm = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(filmId)) {
     return res.status(400).json({ error: "Invalid film ID." });
   }
-
   try {
     const updatedFilm = await Film.findByIdAndUpdate(
       filmId,
@@ -201,7 +200,7 @@ exports.createFilm = async (req, res) => {
     return res.status(400).json({ error: "All fields are required." });
   }
 
-  const imagePath = req.file ? `Uploads/${req.file.filename}` : "";
+  const imagePath = req.file ?` Uploads/${req.file.filename}` : "";
 
   try {
     const film = new Film({
