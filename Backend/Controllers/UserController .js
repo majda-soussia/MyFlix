@@ -4,6 +4,7 @@ const User = require("../Models/User")(mongoose);
 const nodemailer = require("nodemailer");
 
 const Film = require("../Models/Film")(mongoose);
+const jwt = require("jsonwebtoken");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -13,6 +14,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -22,6 +24,26 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const sendEmail = async (to, subject, html) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to,
+    subject,
+    html,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
 
 exports.createUser = async (req, res) => {
   try {
@@ -54,27 +76,46 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       birthday,
       gender,
-      favorites: []
+      favorites: [],
+      isVerified: false
     });
 
     await newUser.save();
 
-    // Optionally send a safe response
-    res.status(201).json({
-      message: "User registered successfully",
-      user: {
-        id: newUser._id,
-        email: newUser.email,
-        firstname: newUser.firstname,
-        lastname: newUser.lastname,
-        birthday: newUser.birthday,
-        gender: newUser.gender
-      }
-    });
+    const verificationToken = jwt.sign(
+      { userId: newUser._id, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const verificationUrl = `http://localhost:3000/login`;
+
+    await sendEmail(
+      email,
+     "Vérification de votre compte",
+      `
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+          <p>Bonjour ${firstname},</p>
+          <p>Merci de vous être inscrit. Veuillez vérifier votre compte en cliquant sur le lien ci-dessous :</p>
+          <p>
+            <a href="${verificationUrl}" style="background-color: #007BFF; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+              Vérifier mon compte
+            </a>
+          </p>
+          <p>Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.</p>
+          <p>Merci,</p>
+          <p>L’équipe Support</p>
+        </div>
+      `
+    );
+
+    res.status(201).json({ message: "User registered. Please check your email." });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.deleteUser = async (req, res) => {
   try {
     const deleteUser = await User.findByIdAndDelete(req.params.id);
@@ -86,6 +127,7 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.updateUser = async (req, res) => {
   try {
     const updates = req.body;
@@ -101,6 +143,7 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 exports.SendEmail = async (req, res) => {
   const { email } = req.body;
@@ -132,14 +175,14 @@ exports.SendEmail = async (req, res) => {
       to: email,
       subject: "Reset your password",
       html: `
-        <p>Dear user,</p>
-        <p>We would like to inform you that a password reset event has been triggered for your account.</p>
-        <p>To complete the reset process and choose a new password, please click the following link:</p>
-        <a href="${url}">${url}</a>
-        <p>If you did not initiate this password reset request, please contact our support team immediately.</p>
-        <p>Thank you for your understanding and cooperation.</p>
-        <p>Best regards,</p>
-      `,
+      <p>Bonjour,</p>
+      <p>Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.</p>
+      <p>Veuillez cliquer sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
+      <p><a href="${url}" style="color: #1a73e8; text-decoration: underline;">Réinitialiser votre mot de passe</a></p>
+      <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email ou contacter notre support.</p>
+      <p>Cordialement,</p>
+      <p>L'équipe de support</p>
+    `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -154,6 +197,24 @@ exports.SendEmail = async (req, res) => {
     return res.status(500).json("Internal server error");
   }
 };
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(payload.id);
+    if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
+
+    user.isVerified = true;
+    await user.save();
+
+    res.status(200).json({ message: "Email vérifié avec succès" });
+  } catch (err) {
+    res.status(400).json({ error: "Token invalide ou expiré" });
+  }
+};
+
 
 
 exports.changePassword = async (req, res) => {
@@ -186,6 +247,7 @@ res.status(200).json({ message: "Password updated successfully." });
     return;
   }
 }
+
 exports.addToFavorites = async (req, res) => {
     try {
         const { userId, movieId } = req.body;
