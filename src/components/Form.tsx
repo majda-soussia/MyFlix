@@ -8,36 +8,39 @@ const Form: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (email === "" || password === "") {
-      alert("Please fill in all the fields!");
-      return;
+  if (email === "" || password === "") {
+    alert("Please fill in all the fields!");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:4000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("userId", data.user._id);
+      console.log(data);
+
+      alert("✅ Login successful!");
+      navigate("/home");
+    } else {
+      alert("❌ " + (data.error || data.message || "Login failed"));
     }
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred. Please try again later.");
+  }
+};
 
-    try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("✅ Login successful!");
-      
-        navigate("/home"); 
-      } else {
-        alert("❌ " + (data.error || data.message || "Login failed"));
-      }
-    } catch (error) {
-      console.error(error);
-      alert("An error occurred. Please try again later.");
-    }
-  };
 
   return (
     <div>

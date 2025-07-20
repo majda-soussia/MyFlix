@@ -3,7 +3,7 @@ import ReactStars from "react-rating-stars-component";
 
 interface MovieDetailsProps {
   movie: {
-    id: number;
+    _id: string;
     title: string;
     image: string;
     rate: number;

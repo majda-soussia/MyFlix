@@ -8,7 +8,6 @@ type ItemProps = {
   rate: number;
   genres: string[];
   onClick: (id: number) => void;
-  onHeartClick: (id: number) => void; // Nouvelle prop pour le clic sur le cœur
 };
 
 const Item: React.FC<ItemProps> = ({
@@ -18,13 +17,7 @@ const Item: React.FC<ItemProps> = ({
   rate,
   genres,
   onClick,
-  onHeartClick,
 }) => {
-  const handleHeartClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log("Film ID cliqué:", id); // Affiche l'ID dans la console
-    onHeartClick(id); // Transmet l'ID au composant parent
-  };
 
   return (
     <div className="item-card" onClick={() => onClick(id)}>
@@ -36,12 +29,6 @@ const Item: React.FC<ItemProps> = ({
           (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
         }}
       />
-      <button className="heart-icon" onClick={handleHeartClick}>
-        <img
-          src="/images/emptyheart1.png" // Vous pouvez gérer l'état du cœur ici
-          alt="favorite"
-        />
-      </button>
       <div className="item-info">
         <h3>{title}</h3>
         <p>{genres?.join(", ") || "Genre inconnu"}</p>

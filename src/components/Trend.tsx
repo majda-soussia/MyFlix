@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import MovieDetails from "./MovieDetails.tsx";
 import Item from "./Item.tsx";
 import ReactStars from "react-rating-stars-component";
+
 const Trend: React.FC = () => {
   type TrendingItem = {
     id: number;
@@ -16,7 +17,6 @@ const Trend: React.FC = () => {
   const [itemsPerView, setItemsPerView] = useState(4);
   const [visibleItems, setVisibleItems] = useState<TrendingItem[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<TrendingItem | null>(null);
-  const [favorites, setFavorites] = useState<number[]>([]);
   const [userRating, setUserRating] = useState<number | null>(null);
 
   // Fetch depuis le backend
@@ -79,15 +79,6 @@ const Trend: React.FC = () => {
     setSelectedMovie(movie || null);
   };
 
-  const handleHeartClick = (movieId: number) => {
-    console.log("ID du film cliqué:", movieId);
-    setFavorites(prev => 
-      prev.includes(movieId)
-        ? prev.filter(id => id !== movieId)
-        : [...prev, movieId]
-    );
-  };
-
   return (
     <div
       style={{
@@ -139,8 +130,6 @@ const Trend: React.FC = () => {
                 rate={item.rate}
                 genres={item.genres}
                 onClick={handleClick}
-                onHeartClick={handleHeartClick}
-                isFavorite={favorites.includes(item.id)}
               />
             </div>
           ))}
@@ -168,8 +157,6 @@ const Trend: React.FC = () => {
           <MovieDetails
             movie={selectedMovie}
             onClose={() => setSelectedMovie(null)}
-            isFavorite={favorites.includes(selectedMovie.id)}
-            toggleFavorite={() => handleHeartClick(selectedMovie.id)}
             userRating={userRating}
             setUserRating={setUserRating}
           />

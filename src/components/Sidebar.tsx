@@ -12,8 +12,8 @@ export const Sidebar: React.FC = ()  => {
   const navigate = useNavigate();
   const location = useLocation();
   const items: SidebarItemType[] = [
-    { label: "WATCH", path: "/", icon: "/images/watch.png", isTitle: true },
-    { label: "Home", path: "/", icon: "/images/home.png" },
+    { label: "WATCH", path: "/home", icon: "/images/watch.png", isTitle: true },
+    { label: "Home", path: "/home", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
     { label: "Profile", path: `/account/${userId}`, icon: "/images/profile.png" },

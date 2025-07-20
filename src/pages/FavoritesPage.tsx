@@ -2,21 +2,20 @@ import React from "react";
 import styles from "./style/Home.module.css";
 import Sidebar from "../components/Sidebar.tsx";
 import Header from "../components/Header.tsx";
-import Trend from "../components/Trend.tsx";
-import Recomandation  from "../components/Recomandation.tsx";
-import ListMovies from "../components/ListMovies.tsx";
-const Home:React.FC= () => {
+import Favorites from "../components/Favorites.tsx";
+
+const FavoritesPage = () => {
   return (
     <div className={styles.container}>
       <Sidebar />
       <div className={styles.content}>
         <Header />
-        <div className={styles.scrollable}>
-          <Trend />
-          <Recomandation />
+        <div className={styles.scrollable} >
+        <Favorites/>
         </div>
       </div>
     </div>
-  );
-};
-export default Home;
+  )
+}
+
+export default FavoritesPage;
