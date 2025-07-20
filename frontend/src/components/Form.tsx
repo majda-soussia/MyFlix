@@ -6,7 +6,12 @@ const Form: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
+  const handleLogin = async () => {
 
+    const userId = 123; // Replace this with real userId from API response
+    localStorage.setItem("userId", userId.toString());
+    navigate("/home");
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -70,7 +75,7 @@ const Form: React.FC = () => {
         <hr />
 
         <div>
-          <button type="submit">LOGIN</button>
+          <button type="submit" onClick={handleLogin}>LOGIN</button>
           <a href="/FormMail" style={{ color: "white", fontWeight: "bold", marginLeft: "10px" }}>
             Forgot Password?
           </a>

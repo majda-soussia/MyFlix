@@ -4,6 +4,7 @@ import { getRandomAvatar } from "../data/avatars.ts";
 import EmojiPicker from "emoji-picker-react";
 import { EmojiClickData } from "emoji-picker-react";
 import { useParams } from "react-router-dom";
+
 type Comment = {
   text: string;
   gender: "male" | "female";

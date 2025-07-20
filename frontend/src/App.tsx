@@ -11,7 +11,7 @@ import Account from "./pages/AccountSetting.tsx";
 import FavoritesPage from "./pages/FavoritesPage.tsx";
 import MovieDetails from "./pages/MovieDetailsPage.tsx";
 import MovieDetailsPage from "./pages/MovieDetailsPage.tsx";
-
+import PrivateRoute from "./components/PrivateRoute";
 const App: React.FC = () => {
   return (
     <div className="App">
@@ -23,7 +23,7 @@ const App: React.FC = () => {
         <Route path="/FormMail" element={<Sendmail />} />
         <Route path="/confirmpassword/:id" element={<PasswordReset />} />
         <Route path="/account/:id" element={<Account />} />
-        <Route path="/favorites/" element={<FavoritesPage />} />
+        <Route path="/favourites/" element={<FavoritesPage />} />
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
       </Routes>
     </div>
