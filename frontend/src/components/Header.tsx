@@ -65,7 +65,7 @@ const Header: React.FC = () => {
           alt="Account"
           title="My Account"
           style={{ width: 24, height: 24, cursor: "pointer" }}
-          onClick={() => navigate("/account")}
+          onClick={() => navigate("/account/:id")}
         />
       </div>
     </header>

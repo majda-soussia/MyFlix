@@ -52,7 +52,7 @@ setBirthday(data.birthday ? data.birthday.slice(0, 10) : "");
 
     try {
       const res = await fetch(`http://localhost:4000/api/users/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstname ,

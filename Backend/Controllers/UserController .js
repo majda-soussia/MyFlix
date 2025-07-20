@@ -149,7 +149,6 @@ exports.SendEmail = async (req, res) => {
   if (!email) {
     return res.status(400).json("Email is required");
   }
-
   try {
     const user = await User.findOne({ email });
 
@@ -186,13 +185,11 @@ exports.SendEmail = async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error("Email sending error:", error);
-        return res.status(500).json("An error occurred while sending the email");
+        console.log(error);
+        res.status(500).json("An error occurred while sending the email");
       }
-
-      return res.status(200).json({ message: "Email sent successfully", info });
-    });
-
+        res.status(200).json({ message: "Email sent successfully", info });
+      });
   } catch (error) {
     console.error("Server error:", error);
     return res.status(500).json("Internal server error");
@@ -241,8 +238,7 @@ exports.changePassword = async (req, res) => {
 );
 res.status(200).json({ message: "Password updated successfully." });
 
-   res.status(200).json(user)
-   return;
+
   } catch (error) {
     res.status(400).json({ error: error.message })
     return;

@@ -22,15 +22,8 @@ exports.loginUser=async(req,res)=>{
             JWT_SECRET,
             {expiresIn:"1h"}
         );
-        res.status(200).json({
-        message: "Login successful",
-        token,
-        user: {
-            _id: user._id,
-            email: user.email
-        }
-        });
-        }catch (err){
-            res.status(500).json({error:err.message});
-        }
+        res.status(200).json({message:'Login succesuful',token });
+}catch (err){
+    res.status(500).json({error:err.message});
+}
 };

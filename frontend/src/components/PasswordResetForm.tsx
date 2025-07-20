@@ -6,7 +6,7 @@ const PasswordResetPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { id } = useParams(); // get user ID from URL
+  const { id } = useParams(); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ const PasswordResetPage: React.FC = () => {
 
       if (res.ok) {
         alert("✅ Password updated successfully. Redirecting to login...");
-        navigate("/login"); // redirect to login
+        navigate("/login"); 
       } else {
         setError("❌ " + data);
       }

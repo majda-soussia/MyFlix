@@ -1,23 +1,35 @@
 import React, { useState, useEffect } from "react";
 import MovieDetails from "./MovieDetails.tsx";
 import Item from "./Item.tsx";
-import { trendingItems } from "../data/movies.ts";
-import ReactStars from "react-rating-stars-component";
+import { useNavigate } from "react-router-dom";
 const Trend: React.FC = () => {
   type TrendingItem = {
     id: number;
     title: string;
-    imageUrl: string;
-    rating: number;
-    type: string;
+    image: string;
+    rate: number;
+    genres: string[];
   };
-  const [currentIndex, setCurrentIndex] =
-    useState(0); /*l’indice de l’élément de départ  visible dans le carousel.*/
-  const [itemsPerView, setItemsPerView] =
-    useState(4); /* nombre d’éléments visibles en même temps dans le carousel.*/
-  const [visibleItems, setVisibleItems] = useState<TrendingItem[]>(
-    []
-  ); /* contient les éléments (objets) à afficher actuellement dans le carousel.*/
+  const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
+  const [selectedMovie, setSelectedMovie] = useState<TrendingItem | null>(null);
+  const [currentIndex, setCurrentIndex] =useState(0); /*l’indice de l’élément de départ  visible dans le carousel.*/
+  const [itemsPerView, setItemsPerView] =useState(4); /* nombre d’éléments visibles en même temps dans le carousel.*/
+  const [visibleItems, setVisibleItems] = useState<TrendingItem[]>([]);
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState<number[]>([]); /* contient les éléments (objets) à afficher actuellement dans le carousel.*/
+  const navigate = useNavigate();
+  useEffect(() => {
+     const fetchTrending = async () => {
+       try {
+         const res = await fetch("http://localhost:4000/api/films");
+         const data = await res.json();
+         setTrendingItems(data);
+       } catch (error) {
+         console.error("Erreur lors du fetch des films :", error);
+       }
+     };
+     fetchTrending();
+   }, []);
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -33,6 +45,7 @@ const Trend: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   useEffect(() => {
+    if (trendingItems.length === 0) return;
     const newVisibleItems = [];
     for (let i = 0; i < itemsPerView; i++) {
       const index = (currentIndex + i) % trendingItems.length;
@@ -51,20 +64,21 @@ const Trend: React.FC = () => {
       prev === trendingItems.length - 1 ? 0 : prev + 1
     );
   };
-  const [selectedMovie, setSelectedMovie] = useState<TrendingItem | null>(null);
+  
 
   const handleClick = (id: number) => {
-    const movie = trendingItems.find((m) => m.id === id);
-    setSelectedMovie(movie || null);
+    navigate(`/movie/${id}`);
   };
-  const [isFavorite, setIsFavorite] = useState(false);
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsFavorite((prev) => !prev);
+  
+
+  const handleHeartClick = (movieId: number) => {
+    console.log("ID du film cliqué:", movieId);
+    setFavorites(prev => 
+      prev.includes(movieId)
+        ? prev.filter(id => id !== movieId)
+        : [...prev, movieId]
+    );
   };
-
-  const [userRating, setUserRating] = useState<number | null>(null);
-
   return (
     <div
       style={{
@@ -105,14 +119,20 @@ const Trend: React.FC = () => {
           {visibleItems.map((item) => (
             <div key={item.id} style={{ minWidth: "250px" }}>
               <Item
-                key={item.id}
                 id={item.id}
                 title={item.title}
-                imageUrl={item.imageUrl}
-                rating={item.rating}
-                type={item.type}
+                image={
+                  item.image?.startsWith("http")
+                    ? item.image
+                    : `http://localhost:4000/${item.image}`
+                }
+                rate={item.rate}
+                genres={item.genres}
                 onClick={handleClick}
+                onHeartClick={handleHeartClick}
+                isFavorite={favorites.includes(item.id)}
               />
+              
             </div>
           ))}
         </div>
@@ -143,12 +163,12 @@ const Trend: React.FC = () => {
       <div>
         {selectedMovie && (
           <MovieDetails
-            movie={selectedMovie}
-            onClose={() => setSelectedMovie(null)}
-            isFavorite={isFavorite}
-            toggleFavorite={toggleFavorite}
-            userRating={userRating}
-            setUserRating={setUserRating}
+          movie={selectedMovie}
+          onClose={() => setSelectedMovie(null)}
+          isFavorite={favorites.includes(selectedMovie.id)}
+          toggleFavorite={() => handleHeartClick(selectedMovie.id)}
+          userRating={userRating}
+          setUserRating={setUserRating}
           />
         )}
       </div>

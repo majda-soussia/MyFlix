@@ -4,6 +4,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require('../Models/User')(mongoose);
+const nodemailer = require("nodemailer");
+
 const UserController = require("../Controllers/UserController ");
 
 //Get All users
