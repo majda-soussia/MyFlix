@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import MovieDetails from "./MovieDetails.tsx";
+import MovieDetails from "../pages/MovieDetailsPage.tsx";
 import Item from "./Item.tsx";
-import ReactStars from "react-rating-stars-component";
-
+import { useNavigate } from "react-router-dom";
 const Trend: React.FC = () => {
   type TrendingItem = {
     id: number;
@@ -11,29 +10,26 @@ const Trend: React.FC = () => {
     rate: number;
     genres: string[];
   };
-
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(4);
-  const [visibleItems, setVisibleItems] = useState<TrendingItem[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<TrendingItem | null>(null);
+  const [currentIndex, setCurrentIndex] =useState(0); /*l’indice de l’élément de départ  visible dans le carousel.*/
+  const [itemsPerView, setItemsPerView] =useState(4); /* nombre d’éléments visibles en même temps dans le carousel.*/
+  const [visibleItems, setVisibleItems] = useState<TrendingItem[]>([]);
   const [userRating, setUserRating] = useState<number | null>(null);
-
-  // Fetch depuis le backend
+  const [favorites, setFavorites] = useState<number[]>([]); /* contient les éléments (objets) à afficher actuellement dans le carousel.*/
+  const navigate = useNavigate();
   useEffect(() => {
-    const fetchTrending = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/api/films");
-        const data = await res.json();
-        setTrendingItems(data);
-      } catch (error) {
-        console.error("Erreur lors du fetch des films :", error);
-      }
-    };
-    fetchTrending();
-  }, []);
-
-  // Gestion du responsive
+     const fetchTrending = async () => {
+       try {
+         const res = await fetch("http://localhost:4000/api/films");
+         const data = await res.json();
+         setTrendingItems(data);
+       } catch (error) {
+         console.error("Erreur lors du fetch des films :", error);
+       }
+     };
+     fetchTrending();
+   }, []);
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -41,19 +37,15 @@ const Trend: React.FC = () => {
         setItemsPerView(6);
       } else if (width >= 1024 && width <= 1280) {
         setItemsPerView(3);
-      } else {
-        setItemsPerView(2);
       }
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Mise à jour des éléments visibles
   useEffect(() => {
     if (trendingItems.length === 0) return;
-
     const newVisibleItems = [];
     for (let i = 0; i < itemsPerView; i++) {
       const index = (currentIndex + i) % trendingItems.length;
@@ -61,7 +53,6 @@ const Trend: React.FC = () => {
     }
     setVisibleItems(newVisibleItems);
   }, [currentIndex, itemsPerView, trendingItems]);
-
   const handlePrev = () => {
     setCurrentIndex((prev) =>
       prev === 0 ? trendingItems.length - 1 : prev - 1
@@ -73,12 +64,21 @@ const Trend: React.FC = () => {
       prev === trendingItems.length - 1 ? 0 : prev + 1
     );
   };
+  
 
   const handleClick = (id: number) => {
-    const movie = trendingItems.find((m) => m.id === id);
-    setSelectedMovie(movie || null);
+    navigate(`/movie/${id}`);
   };
+  
 
+  const handleHeartClick = (movieId: number) => {
+    console.log("ID du film cliqué:", movieId);
+    setFavorites(prev => 
+      prev.includes(movieId)
+        ? prev.filter(id => id !== movieId)
+        : [...prev, movieId]
+    );
+  };
   return (
     <div
       style={{
@@ -99,7 +99,6 @@ const Trend: React.FC = () => {
       >
         Trending at this moment
       </h2>
-
       <div
         style={{
           position: "relative",
@@ -129,12 +128,22 @@ const Trend: React.FC = () => {
                 }
                 rate={item.rate}
                 genres={item.genres}
-                onClick={handleClick}
+                onClick={() => handleClick(item.id)}
+                onHeartClick={handleHeartClick}
+                isFavorite={favorites.includes(item.id)}
               />
+              
             </div>
           ))}
         </div>
-
+        <div
+          style={{
+            position: "relative", // essentiel pour que les flèches se placent bien
+            maxWidth: "1700px",
+            margin: "0 auto",
+            overflow: "hidden",
+          }}
+        ></div>
         <button
           onClick={handlePrev}
           style={navButtonStyle("left")}
@@ -151,21 +160,14 @@ const Trend: React.FC = () => {
           &gt;
         </button>
       </div>
-
       <div>
         {selectedMovie && (
-          <MovieDetails
-            movie={selectedMovie}
-            onClose={() => setSelectedMovie(null)}
-            userRating={userRating}
-            setUserRating={setUserRating}
-          />
+          <MovieDetails/>
         )}
       </div>
-    </div>
+      </div>
   );
 };
-
 const navButtonStyle = (position: "left" | "right") => ({
   position: "absolute" as const,
   [position]: "0px",
@@ -188,6 +190,8 @@ const navButtonStyle = (position: "left" | "right") => ({
   alignItems: "center",
   justifyContent: "center",
   opacity: 0.9,
+  hover: {
+    background: "#e64a19",
+  },
 });
-
 export default Trend;

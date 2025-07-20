@@ -46,7 +46,7 @@ const Header: React.FC = () => {
           onBlur={(e) => (e.currentTarget.style.width = "200px")}
         />
 
-        <img
+         <img
           src="/images/search.png"
           alt="search"
           title="search"

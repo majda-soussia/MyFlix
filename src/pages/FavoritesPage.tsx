@@ -11,7 +11,7 @@ const FavoritesPage = () => {
       <div className={styles.content}>
         <Header />
         <div className={styles.scrollable} >
-        <Favorites/>
+          <Favorites/>
         </div>
       </div>
     </div>

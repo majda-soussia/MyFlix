@@ -12,8 +12,8 @@ export const Sidebar: React.FC = ()  => {
   const navigate = useNavigate();
   const location = useLocation();
   const items: SidebarItemType[] = [
-    { label: "WATCH", path: "/home", icon: "/images/watch.png", isTitle: true },
-    { label: "Home", path: "/home", icon: "/images/home.png" },
+    { label: "WATCH", path: "/", icon: "/images/watch.png", isTitle: true },
+    { label: "Home", path: "/home/*", icon: "/images/home.png" },
     { label: "Favourites", path: "/favourites", icon: "/images/favoris.png" },
     { label: "Trending", path: "/trending", icon: "/images/trend.png" },
     { label: "Profile", path: `/account/${userId}`, icon: "/images/profile.png" },
@@ -48,8 +48,10 @@ export const Sidebar: React.FC = ()  => {
           label="Logout"
           icon="/images/logout.png"
           onClick={() => {
-            navigate("/login");
+            localStorage.clear();
+            navigate("/login", { replace: true }); // This prevents back button from going to the previous page
           }}
+          
           active={false}
         />
       </div>
