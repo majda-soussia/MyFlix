@@ -1,0 +1,108 @@
+.user-dashboard {
+  background: linear-gradient(
+    90deg,
+    rgba(54, 5, 5, 1) 0%,
+    rgba(0, 0, 0, 1) 6%,
+    rgba(0, 0, 0, 1) 41%,
+    rgba(0, 0, 0, 1) 51%,
+    rgba(0, 0, 0, 1) 56%,
+    rgba(0, 0, 0, 1) 77%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  color: #f0ecec;
+  height: 100vh;
+  padding: 40px;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.user-info-card {
+  border-radius: 15px;
+
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.user-table th {
+  color: #555;
+}
+
+.user-table td {
+  color: #ffffff;
+}
+.user-table img:hover {
+    transform: scale(1.2);
+  }
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  background-color: #000000;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+user-form input,
+.user-form select {
+  background-color: #000;
+  color: white;
+  border: 1px solid #333;
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.user-form input:focus,
+.user-form select:focus {
+  border: 1px solid #a42525;
+}
+.user-form button {
+  background-color: #7c1d1d;
+  color: white;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.user-form button:hover {
+  background-color: #a42525;
+}
+.Add {
+  background-color: #7c1d1d;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin: 1rem auto;
+  display: block;
+}
+.Add:hover {
+  background-color: #a42525;
+}

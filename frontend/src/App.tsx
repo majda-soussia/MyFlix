@@ -11,7 +11,8 @@ import MovieDetailsPage  from "./pages/MovieDetailsPage.tsx";
 import AccountSetting from "./pages/AccountSetting.tsx";
 import FavoritesPage from "./pages/FavoritesPage.tsx";
 import SearchMovies from "./pages/SearchMovies.tsx";
-
+import DashboardUser from "./pages/UserDashbordspage.tsx";
+import DashboardMovies from "./pages/MoviesDashboardpage.tsx"
 const App: React.FC =()=> {
   return (
     <div className="App">
@@ -26,7 +27,8 @@ const App: React.FC =()=> {
         <Route path="/account/:id" element={<AccountSetting/>} />
         <Route path="/favourites" element={<FavoritesPage/>} />
         <Route path="/search/:id" element={<SearchMovies />} />
-         
+        <Route path="/Userdashboard" element={<DashboardUser />} />
+        <Route path="/Moviesdashboard" element={<DashboardMovies />} />
       </Routes>
   </div>
   );
