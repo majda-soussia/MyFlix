@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./style/Settings.css";
+import { useRef } from "react";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<"details" | "password">("details");
   const userId = localStorage.getItem("userId");
-
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [firstname, setFirstname] = useState("");
@@ -13,6 +13,11 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [birthday, setBirthday] = useState("");
   const [gender, setGender] = useState("");
+  const [showForgotEmail, setShowForgotEmail] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState("/images/user.png"); // par défaut
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   // Récupération des données utilisateur au chargement
   useEffect(() => {
@@ -36,6 +41,10 @@ const Settings = () => {
         setConfirmPassword("");
         setBirthday(data.birthday || "");
         setGender(data.gender || "");
+
+        if (data.avatar) {
+  setAvatarPreview(`http://localhost:4000${data.avatar}`);
+}
       } catch (error) {
         console.error("Erreur lors du chargement de l'utilisateur :", error);
       }
@@ -117,6 +126,38 @@ const Settings = () => {
   }
 };
 
+const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file || !userId) return;
+
+  // Affiche une preview
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setAvatarPreview(reader.result as string);
+  };
+  reader.readAsDataURL(file);
+
+  // Préparer les données pour upload
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  try {
+    const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Erreur lors de l’upload de l’avatar");
+
+    const data = await response.json();
+    console.log("Avatar mis à jour :", data);
+    alert("Avatar mis à jour !");
+  } catch (err) {
+    console.error("Erreur upload avatar :", err);
+    alert("Échec de l’upload de l’avatar");
+  }
+};
+
 
   return (
     <div>
@@ -124,7 +165,21 @@ const Settings = () => {
 
       <div className="settings-content">
         <div className="settings-header">
-          <img className="avatar" src="/images/user.png" alt="User avatar" />
+         <div className="avatar-container" onClick={() => fileInputRef.current?.click()} style={{ cursor: "pointer" }}>
+          <img
+            className="avatar"
+            src={avatarPreview}
+            alt="User avatar"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleAvatarChange}
+          />
+        </div>
+
           <h2>Settings</h2>
         </div>
 
@@ -205,36 +260,68 @@ const Settings = () => {
           </form>
         )}
 
-        {activeTab === "password" && (
-        <form className="settings-form" onSubmit={handleChangePassword}>
-          <div className="form-group">
-            <label>New Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+       {activeTab === "password" && (
+  <form className="settings-form" onSubmit={handleChangePassword}>
+    <div className="form-group full">
+      <label>Old Password</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+    </div>
 
-          <div className="form-group">
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
+    <div className="form-group full">
+      <label>New Password</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+    </div>
 
-          <div className="form-buttons">
-            <button type="button" className="btn cancel">
-              Cancel
-            </button>
-            <button type="submit" className="btn save">
-              Change Password
-            </button>
-          </div>
-        </form>
-      )}
+    <div className="form-group full">
+      <label>Confirm New Password</label>
+      <input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+      />
+    </div>
+
+    <a
+      href="#"
+      className="forgot-password"
+      onClick={(e) => {
+        e.preventDefault();
+        setShowForgotEmail(!showForgotEmail);
+      }}
+    >
+      Forgot Old Password?
+    </a>
+
+    {showForgotEmail && (
+      <div className="form-group full">
+        <label>Enter your email</label>
+        <input
+          type="email"
+          value={forgotEmail}
+          onChange={(e) => setForgotEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+      </div>
+    )}
+
+    <div className="form-buttons">
+      <button type="button" className="btn cancel">
+        Cancel
+      </button>
+      <button type="submit" className="btn save">
+        Change Password
+      </button>
+    </div>
+  </form>
+)}
       </div>
     </div>
   );

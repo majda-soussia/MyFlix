@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Item from "./Item.tsx";
+import Item from "../components/Item.tsx";
 
 interface Film {
   id: number;

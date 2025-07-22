@@ -1,19 +1,22 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ReactStars from "react-rating-stars-component";
-import { getRandomAvatar } from "../data/avatars.ts";
 import EmojiPicker from "emoji-picker-react";
 import { EmojiClickData } from "emoji-picker-react";
 import { useParams } from "react-router-dom";
 
+// Types
+
 type Comment = {
+  _id?: string;
   text: string;
-  gender: "male" | "female";
   avatar: string;
   userName: string;
+  movieId: string;
   createdAt?: string;
 };
+
 type Movie = {
-  id: number;
+  id: string;
   title: string;
   image: string;
   rate: number;
@@ -28,31 +31,22 @@ const MovieDetails: React.FC = () => {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
-  const [movieComments, setMovieComments] = useState<{ [movieId: number]: Comment[] }>(() => {
-    const saved = localStorage.getItem("movieComments");
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [movieComments, setMovieComments] = useState<{ [movieId: string]: Comment[] }>({});
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
-
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
-    if (!id) {
-      console.error("❌ No movie ID in URL.");
-      return;
-    }
-  
-    console.log("📡 Fetching movie with ID:", id);
-  
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
     fetch(`http://localhost:4000/api/films/${id}`)
-      .then((res) => {
-        console.log("➡️ Response status:", res.status);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
-        console.log("✅ Movie fetched:", data);
         setMovie(data);
         setLoading(false);
       })
@@ -63,82 +57,91 @@ const MovieDetails: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    setIsClient(true);
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    fetch(`http://localhost:4000/api/users/${userId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setUserData(data);
+      })
+      .catch((err) => console.error("Erreur chargement utilisateur:", err));
   }, []);
 
-  useEffect(() => {
-  const fetchFavorites = async () => {
+  const fetchComments = async () => {
     try {
-      const userId = localStorage.getItem('userId');
-      
-      if (!userId) {
-        console.log('No user ID found');
-        return;
-      }
+      const res = await fetch(`http://localhost:4000/api/comments/${id}`);
+      if (!res.ok) throw new Error("Erreur lors du fetch des commentaires");
 
-      const response = await fetch(`http://localhost:4000/api/users/favorites/${userId}`);
-      
-      if (response.ok) {
-        const data = await response.json();  // data = { favorites: [...] }
-        const favoritesArray: string[] = data.favorites;
+      const data = await res.json();
+      const defaultAvatar = "/images/user.png";
 
-        // Créer un objet pour lookup rapide (pas obligatoire, mais pratique)
-        const favoritesMap = favoritesArray.reduce((acc, movieId) => {
-          acc[movieId] = true;
-          return acc;
-        }, {} as { [key: string]: boolean });
-
-        // Stocker dans localStorage sous forme de tableau simple (plus simple à manipuler)
-        localStorage.setItem('favorites', JSON.stringify(favoritesArray));
-        
-        if (id) {
-          setIsFavorite(favoritesArray.includes(id));
-        }
-      }
+      const transformed = data.map((comment: any) => ({
+        text: comment.message,
+        userName: comment.username ?? "Anonymous",
+        avatar: comment.avatar ? `http://localhost:4000${comment.avatar}`
+          : defaultAvatar,
+        movieId: comment.filmId,
+        createdAt: comment.createdAt,
+      }));
+      console.log(transformed)
+      setMovieComments({ [id!]: transformed });
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      console.error("❌ Error fetching comments:", error);
     }
   };
 
-  fetchFavorites();
-}, [id]);
-
-
-
   useEffect(() => {
-    localStorage.setItem("movieComments", JSON.stringify(movieComments));
-  }, [movieComments]);
-  
-  const currentUser = useMemo(() => {
-    const stored = localStorage.getItem("currentUser");
-    return stored ? JSON.parse(stored) : null;
-  }, []);
-  
-  const gender = (currentUser?.gender || "male") as "male" | "female";
+    if (id) fetchComments();
+  }, [id]);
 
-  const userAvatar = useMemo(() => getRandomAvatar(gender), [gender]);
-
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!movie) return;
-    if (comment.trim()) {
-      const newComment: Comment = {
-        text: comment.trim(),
-        gender,
-        avatar: userAvatar,
-        userName: `${currentUser?.firstname ?? "Anonymous"} ${currentUser?.lastname ?? ""}`,
-      };
 
-      setMovieComments((prev) => {
-        const updatedComments = prev[movie.id] ? [...prev[movie.id]] : [];
-        updatedComments.unshift(newComment);
-        return {
-          ...prev,
-          [movie.id]: updatedComments,
-        };
+    if (!movie || !comment.trim()) return;
+
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/comments/create/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: comment.trim(),
+          userId,
+        }),
       });
 
+      if (!res.ok) throw new Error("Erreur lors de l’envoi du commentaire");
+
       setComment("");
+      fetchComments();
+    } catch (error) {
+      console.error("Erreur POST commentaire :", error);
+    }
+  };
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const userId = localStorage.getItem("userId");
+    if (!userId || !id) return;
+
+    try {
+      const url = isFavorite
+        ? "http://localhost:4000/api/users/favorites/remove"
+        : "http://localhost:4000/api/users/favorites/add";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, movieId: id }),
+      });
+
+      if (!res.ok) throw new Error("Erreur modification favori");
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -146,161 +149,44 @@ const MovieDetails: React.FC = () => {
     setComment((prev) => prev + emojiData.emoji);
   };
 
-  const toggleFavorite = async (e: React.MouseEvent) => {
-  e.stopPropagation();
-
-  const userId = localStorage.getItem("userId");
-  if (!userId || !id) {
-    console.error("UserId ou movieId manquant");
-    return;
-  }
-
-  try {
-    if (isFavorite) {
-      // Suppression du favori
-      const res = await fetch("http://localhost:4000/api/users/favorites/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, movieId: id }),
-      });
-
-      if (!res.ok) throw new Error("Erreur suppression favori");
-
-      // Mettre à jour localStorage
-      const favorites: string[] = JSON.parse(localStorage.getItem("favorites") || "[]");
-      const updatedFavorites = favorites.filter(favId => favId !== id);
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      setIsFavorite(false);
-
-    } else {
-      // Ajout du favori
-      const res = await fetch("http://localhost:4000/api/users/favorites/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, movieId: id }),
-      });
-
-      if (!res.ok) throw new Error("Erreur ajout favori");
-
-      const favorites: string[] = JSON.parse(localStorage.getItem("favorites") || "[]");
-      const updatedFavorites = [...favorites, id];
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      setIsFavorite(true);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-
-  if (loading) {
-    return <p style={{ color: "white" }}>Loading movie details...</p>;
-  }
-
-  if (!movie) {
-    return <p style={{ color: "white" }}>Movie not found.</p>;
-  }
-  
-  if (!currentUser) {
-    return <p style={{ color: "white" }}>Please log in to comment or rate the movie.</p>;
-  }
+  if (loading) return <p style={{ color: "white" }}>Loading movie details...</p>;
+  if (!movie) return <p style={{ color: "white" }}>Movie not found.</p>;
+  if (!userData) return <p style={{ color: "white" }}>Please log in to comment or rate the movie.</p>;
 
   return (
-    <div
-      style={{
-        minHeight: "200vh",
-        width: "100%",
-        background:"linear-gradient(90deg,rgba(54, 5, 5, 1) 0%, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 41%, rgba(0, 0, 0, 1) 51%, rgba(0, 0, 0, 1) 56%, rgba(0, 0, 0, 1) 77%, rgba(0, 0, 0, 1) 100%)",
-        color: "#fff",
-        padding: "60px 80px",
-        display: "flex",
-        gap: "50px",
-        flexWrap: "wrap",
-        boxSizing: "border-box",
-      }}
-    >
-      <div style={{ flex: "0 0 320px" }}>
-     <img
-        src={
-          movie.image?.startsWith("http")
-            ? movie.image
-            : `http://localhost:4000/${movie.image}`
-        }
-        alt={movie.title}
-        style={{
-          width: "100%",
-          height: "500px",
-          borderRadius: "12px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-        }}
-      />
-      </div>
-
-      <div style={{ flex: 1, minWidth: "360px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h1
-            style={{
-              fontSize: "36px",
-              fontWeight: "bold",
-              marginBottom: "10px",
-            }}
-          >
-            {movie.title}
-          </h1>
-
-          <button
-            onClick={toggleFavorite}
-            style={{
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              alignSelf: "flex-start",
-            }}
-          >
-            <img
-              src={
-                isFavorite
-                  ? "/images/fullheart1.png"
-                  : "/images/emptyheart1.png"
-              }
-              alt="favorite"
-              style={{ width: "36px", height: "36px" }}
-            />
-          </button>
-
+    <div style={{ minHeight: "200vh", padding: "60px 80px", color: "white" }}>
+      <div style={{ display: "flex", gap: "50px", flexWrap: "wrap" }}>
+        <div style={{ flex: "0 0 320px" }}>
+          <img
+            src={movie.image?.startsWith("http") ? movie.image : `http://localhost:4000/${movie.image}`}
+            alt={movie.title}
+            style={{ width: "100%", height: "500px", borderRadius: "12px" }}
+          />
         </div>
-        <div style={{ justifyItems: "self-start" }}>
-          <p style={{ color: "#ccc", marginBottom: "8px" }}>
-            {movie.year || "2024"} &nbsp;|&nbsp; {movie.genres?.join(", ") || "Genre"}{" "}
-            &nbsp;|&nbsp; {movie.duration || "2h 30m"}
-          </p>
 
-          <p
-            style={{
-              fontSize: "17px",
-              lineHeight: "1.6",
-              marginBottom: "30px",
-            }}
-          >
-            {movie.description ||
-              "No description available for this movie. Please check back later."}
-          </p>
-
-          <div style={{ marginBottom: "20px", display: "flex", gap: "20px" }}>
-            <p style={{ fontSize: "18px", marginTop: "10px" }}>
-              Average Rating:
-            </p>
-            <ReactStars
-              count={5}
-              size={30}
-              value={movie.rate / 2}
-              edit={false}
-              activeColor="#ffd700"
-            />
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h1>{movie.title}</h1>
+            <button onClick={toggleFavorite} style={{ background: "none", border: "none" }}>
+              <img
+                src={isFavorite ? "/images/fullheart1.png" : "/images/emptyheart1.png"}
+                alt="favorite"
+                style={{ width: "36px", height: "36px" }}
+              />
+            </button>
           </div>
 
-          <div style={{ marginBottom: "30px", display: "flex", gap: "20px" }}>
-            <p style={{ fontSize: "18px", marginTop: "10px" }}>Your Rating:</p>
+          <p style={{ textAlign: 'left' }}>{movie.year || "2024"} | {movie.genres?.join(", ")} | {movie.duration || "2h 30m"}</p>
+          <p style={{ textAlign: 'left' }}>{movie.description || "No description available."}</p>
+
+         <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+          <p style={{ margin: 0 }}>Average Rating:</p>
+          <ReactStars count={5} size={30} value={movie.rate / 2} edit={false} activeColor="#ffd700" />
+        </div>
+
+
+         <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <p style={{ margin: 0 }}>Your Rating:</p>
             <ReactStars
               count={5}
               size={30}
@@ -309,132 +195,66 @@ const MovieDetails: React.FC = () => {
               activeColor="#ffb700"
             />
           </div>
-          <div style={{ justifyItems: "self-start" }}>
-            <h3 style={{ fontSize: "20px", marginBottom: "0px" }}>
-              Add a comment:
-            </h3>
 
-            <form
-              onSubmit={handleCommentSubmit}
-              style={{ margin: "0px", paddingLeft: "0px" }}
-            >
-              <div style={{ position: "relative", marginBottom: "10px" }}>
-                <textarea
-                  value={comment}
-                  rows={5}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Write your thoughts..."
-                  style={{
-                    width: "170%",
-                    padding: "16px",
-                    fontSize: "16px",
-                    borderRadius: "8px",
-                    border: "1px solid #444",
-                    backgroundColor: "#1e1e1e",
-                    color: "#fff",
-                    resize: "none",
-                    marginBottom: "10px",
-                    boxSizing: "border-box",
-                  }}
+       <form onSubmit={handleCommentSubmit} style={{ textAlign: "left", maxWidth: "600px", margin: "0" }}>
+  <div style={{ position: "relative", width: "100%" }}>
+    <textarea
+      value={comment}
+      rows={6}
+      onChange={(e) => setComment(e.target.value)}
+      placeholder="Write your thoughts..."
+      style={{ width: "100%", paddingRight: "40px", marginBottom: "10px", fontSize: "16px", resize: "vertical" }}
+    />
+    <button
+      type="button"
+      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+      style={{
+        position: "absolute",
+        right: "8px",
+        top: "80%",
+        transform: "translateY(-50%)",
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+        fontSize: "20px",
+        padding: 0,
+        userSelect: "none",
+      }}
+      aria-label="Toggle Emoji Picker"
+    >
+      🙂
+    </button>
+  </div>
+
+  {isClient && showEmojiPicker && <EmojiPicker onEmojiClick={handleEmojiClick} />}
+
+  <button type="submit" style={{ marginTop: "10px" }}>
+    Submit Comment
+  </button>
+</form>
+
+
+
+          <h3 style={{ marginTop: "40px",textAlign:"left" }}>All Comments</h3>
+          <ul style={{ listStyle: "none", padding: 0, marginTop: "20px" }}>
+            {movieComments[id!]?.length > 0 ? (
+              movieComments[id!].map((c) => (
+                <li key={c._id} style={{ display: "flex", marginBottom: "15px" }}>
+                <img src={c.avatar}
+                  alt="avatar"
+                  style={{ width: "60px", height: "60px", borderRadius: "50%", marginRight: "10px" }}
                 />
-                <button
-                  type="button"
-                  aria-label="Toggle Emoji Picker"
-                  onClick={() => setShowEmojiPicker((prev) => !prev)}
-                  style={{
-                    position: "absolute",
-                    bottom: "16px",
-                    right: "-140px",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    borderRadius: "50%",
-                    padding: "8px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    color: "#fff",
-                    transition: "background 0.3s",
-                  }}
-                >
-                  🙂
-                </button>
-              </div>
-              {isClient && showEmojiPicker && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "60px",
-                    left: "1000px",
-                    zIndex: 10,
-                    background: "#2a2a2a",
-                    borderRadius: "8px",
-                    padding: "5px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
-                  }}
-                >
-                  <EmojiPicker onEmojiClick={handleEmojiClick} />
-                </div>
-              )}
-              <button
-                type="submit"
-                style={{
-                  padding: "14px 24px",
-                  fontSize: "16px",
-                  background: "#8A1111",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  transition: "background 0.3s",
-                }}
-              >
-                Submit Comment
-              </button>
-            </form>
 
-            <h3 style={{ marginTop: "40px", fontSize: "22px" }}>
-              All Comments
-            </h3>
-            <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-              {movieComments[movie.id]?.length > 0 ? (
-                movieComments[movie.id].map((c, idx) => (
-                  <li
-                    key={idx}
-                    style={{
-                      width: "800px",
-                      height: "100px",
-                      display: "flex",
-                      alignItems: "flex-start",
-                      marginBottom: "15px",
-                      background: "#1a1a1a",
-                      padding: "10px",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <img
-                      src={c.avatar}
-                      alt="avatar"
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        marginRight: "12px",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <div>
-                      <strong style={{ color: "#fff" }}>{c.userName}</strong>
-                      <p style={{ margin: 0, color: "#ddd" }}>{c.text}</p>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <p style={{ color: "#aaa" }}>
-                  No comments yet. Be the first to comment!
-                </p>
-              )}
-            </ul>
-          </div>
+                  <div>
+                    <strong>{c.userName}</strong>
+                    <p style={{textAlign:"left"}}>{c.text}</p>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p>No comments yet.</p>
+            )}
+          </ul>
         </div>
       </div>
     </div>

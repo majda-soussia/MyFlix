@@ -20,7 +20,7 @@ const App: React.FC =()=> {
         <Route path="/login" element={<Login />} />
         <Route path="/home/*" element={<Home />} /> 
         <Route path="/register" element={<Register />} />
-        <Route path="/FormMail" element={<Sendmail/>} />   
+        <Route path="/FormMail" element={<Sendmail/>} />
         <Route path="/confirmpassword/:id" element={<PasswordReset/>} />   
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
         <Route path="/account/:id" element={<AccountSetting/>} />
